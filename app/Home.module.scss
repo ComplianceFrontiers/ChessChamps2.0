@@ -1,0 +1,47 @@
+/* Home.module.scss */
+.container {
+    background-color: #0e1b2a;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); // Exactly 4 columns
+    gap: 2rem;
+    max-width: 1000px; // Optional: increase if needed to avoid squishing cards
+    margin: 0 auto;
+  }
+  
+  
+  .card {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+  }
+  
+  .card span {
+    margin-top: 0.5rem;
+    font-size:calc(1rem + 1vmin);
+    font-weight: 400;
+  }
+  
