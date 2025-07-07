@@ -3,6 +3,27 @@
 import React, { useState } from 'react';
 import styles from './Training.module.scss';
 
+const SessionCard = ({ session, status }) => {
+  return (
+    <div className={styles['session-card']}>
+      <span className={styles['session-info']}>
+        {`${session.date} | ${session.topic} | ${session.coach}`}
+      </span>
+      {status ? (
+        <span
+          className={`${styles['status-badge']} ${
+            status === 'present' ? styles.present : styles.absent
+          }`}
+        >
+          {status.toUpperCase()}
+        </span>
+      ) : (
+        <button className={styles['join-button']}>JOIN</button>
+      )}
+    </div>
+  );
+};
+
 const Training = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
 
@@ -11,6 +32,13 @@ const Training = () => {
     { date: '27-July-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov' },
     { date: '29-July-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov' },
     { date: '31-July-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov' },
+  ];
+
+  const pastSessions = [
+    { date: '25-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'present' },
+    { date: '27-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'absent' },
+    { date: '29-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'present' },
+    { date: '31-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'present' },
   ];
 
   return (
@@ -34,19 +62,13 @@ const Training = () => {
 
       {activeTab === 'upcoming' &&
         upcomingSessions.map((session, index) => (
-          <div key={index} className={styles['session-card']}>
-            <span className={styles['session-info']}>
-              {`${session.date} | ${session.topic} | ${session.coach}`}
-            </span>
-            <button className={styles['join-button']}>JOIN</button>
-          </div>
+          <SessionCard key={index} session={session} />
         ))}
 
-      {activeTab === 'past' && (
-        <div className={styles['no-sessions']}>
-          <p>No past sessions available yet.</p>
-        </div>
-      )}
+      {activeTab === 'past' &&
+        pastSessions.map((session, index) => (
+          <SessionCard key={index} session={session} status={session.status} />
+        ))}
     </div>
   );
 };

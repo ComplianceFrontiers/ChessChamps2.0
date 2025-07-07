@@ -13,7 +13,7 @@
     margin-bottom: 1rem;
   
     @media (max-width: 768px) {
-      font-size: 1rem;
+      font-size: 1.5rem;
     }
   }
   
@@ -43,9 +43,9 @@
   .session-card {
     background-color: white;
     color: #0d2649;
-    margin-bottom: 0.5rem; // reduced
-    padding: 0.5rem 1rem; // reduced
-    border-radius: 4px; // slightly reduced
+    margin-bottom: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -53,14 +53,15 @@
     @media (max-width: 768px) {
       flex-direction: column;
       align-items: flex-start;
+      gap: 0.8rem;
     }
   }
   
   .session-info {
-    font-size: 1rem; // reduced from 1.2rem
+    font-size: 1rem;
   
     @media (max-width: 768px) {
-      font-size: 0.9rem; // reduced
+      font-size: 0.9rem;
     }
   }
   
@@ -69,20 +70,33 @@
     color: white;
     border: none;
     border-radius: 25px;
-    padding: 0.7rem 1.2rem; // reduced
+    padding: 0.5rem 1.2rem;
     cursor: pointer;
     font-weight: bold;
-    font-size: 0.9rem; // smaller text
-    align-self: flex-end;
+    font-size: 0.9rem;
   
     @media (max-width: 768px) {
-      padding: 0.3rem 0.8rem; // even smaller on mobile
+      padding: 0.3rem 0.8rem;
       font-size: 0.8rem;
-      align-self: flex-end;
     }
   }
   
+  .status-badge {
+    font-weight: bold;
+    font-size: 0.85rem;
+    border-radius: 25px;
+    padding: 0.4rem 1rem;
+    text-align: center;
+    color: white;
+  }
   
+  .present {
+    background-color: #7ce97c;
+  }
+  
+  .absent {
+    background-color: #f97256;
+  }
   
   .no-sessions {
     text-align: center;
