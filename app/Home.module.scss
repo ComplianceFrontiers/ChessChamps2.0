@@ -64,7 +64,6 @@
 /* For mobile devices */
 @media (max-width: 768px) {
   .grid {
-    grid-template-columns: 1fr; // 1 column for mobile devices
     gap: 1rem; // Smaller gap between cards
   }
 
