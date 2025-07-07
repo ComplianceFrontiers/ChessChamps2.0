@@ -1,0 +1,82 @@
+.training-container {
+    background-color: #0d2649;
+    color: white;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: sans-serif;
+  }
+  
+  .heading {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 2rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  
+    span {
+      cursor: pointer;
+  
+      &.active {
+        font-weight: bold;
+        border-bottom: 3px solid white;
+      }
+    }
+  
+    @media (max-width: 768px) {
+      gap: 1rem;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+  }
+  
+  .session-card {
+    background-color: white;
+    color: #0d2649;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+  
+  .session-info {
+    font-size: 1.2rem;
+  
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+  
+  .join-button {
+    background-color: #6a5841;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .no-sessions {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
