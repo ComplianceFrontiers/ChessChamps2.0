@@ -1,13 +1,17 @@
 .with-sidebar-layout {
   display: flex;
   height: 100vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .sidebar {
   width: 80px;
-  height: 100vh;              // Full viewport height
-  overflow-y: auto;           // Vertical scroll when needed
-  position: sticky;           // Keeps it fixed while scrolling
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
   top: 0;
   background-color: #0e1b2a;
   display: flex;
@@ -21,9 +25,40 @@
     display: none;
   }
 
-  /* Hide scrollbar (Firefox) */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  // @media (max-width: 768px) {
+  //   position: absolute;
+  //   top: 0;
+  //   left: -100%;
+  //   width: 200px;
+  //   height: 100vh;
+  //   z-index: 1000;
+  //   background-color: #0e1b2a;
+  //   transition: left 0.3s ease;
+
+  //   &.open {
+  //     left: 0;
+  //   }
+  // }
+}
+
+.sidebar-toggle {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  color: white;
+  background: none;
+  border: none;
+  z-index: 1100;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 }
 
 .sidebar-link {
@@ -48,10 +83,20 @@
   span {
     margin-top: 4px;
   }
+
+  // Mobile view: reduce font size
+  @media (max-width: 768px) {
+    font-size: 10px;
+  }
 }
+
 
 .content {
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding-top: 3rem;
+  }
 }
