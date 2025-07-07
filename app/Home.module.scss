@@ -1,47 +1,78 @@
 /* Home.module.scss */
 .container {
-    background-color: #0e1b2a;
-    min-height: 100vh;
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-    color: #fff;
-    text-align: center;
-  }
-  
-  .title {
-    font-size: 4rem;
-    margin-bottom: 2rem;
-    font-weight: 400;
-  }
-  
+  background-color: #0e1b2a;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  text-align: center;
+}
+
+.title {
+  font-size: 4rem;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); // Exactly 4 columns
+  gap: 2rem;
+  max-width: 1000px; // Optional: increase if needed to avoid squishing cards
+  margin: 0 auto;
+}
+
+.card {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.card span {
+  margin-top: 0.5rem;
+  font-size: calc(1rem + 1vmin);
+  font-weight: 400;
+}
+
+/* Media Queries for Responsiveness */
+
+/* For tablets (medium screens) */
+@media (max-width: 1024px) {
   .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); // Exactly 4 columns
-    gap: 2rem;
-    max-width: 1000px; // Optional: increase if needed to avoid squishing cards
-    margin: 0 auto;
+    grid-template-columns: repeat(2, 1fr); // 2 columns for medium-sized screens
   }
-  
-  
-  .card {
-    background-color: transparent;
-    border: none;
-    color: #fff;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.2s ease;
+
+  .title {
+    font-size: 3rem; // Decrease title font size
   }
-  
-  .card:hover {
-    transform: scale(1.1);
-    cursor: pointer;
-  }
-  
+
   .card span {
-    margin-top: 0.5rem;
-    font-size:calc(1rem + 1vmin);
-    font-weight: 400;
+    font-size: calc(0.9rem + 1vmin); // Slightly smaller text for mobile
   }
-  
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr; // 1 column for mobile devices
+    gap: 1rem; // Smaller gap between cards
+  }
+
+  .title {
+    font-size: 2.5rem; // Further decrease font size
+  }
+
+  .card span {
+    font-size: calc(0.8rem + 1vmin); // Smaller text for mobile
+  }
+}
