@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   School,
   BookOpenCheck,
@@ -8,7 +9,6 @@ import {
   Monitor,
   Trophy,
   PieChart,
-  Phone,
   Mail,
   LogOut,
 } from "lucide-react";
@@ -28,7 +28,27 @@ export default function Home1() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard</h1>
+      <div className={styles.topRightBlock}>
+        <Image
+          src="/chesschamps.png"
+          alt="Chess Champs Logo"
+          width={60}
+          height={60}
+          className={styles.dashboardLogo}
+        />
+        <Image
+          src="/contentbelowlogo.png"
+          alt="Chess Kids Playing"
+          width={80}
+          height={100}
+          className={styles.belowLogo}
+        />
+      </div>
+  
+      <div className={styles.dashboardHeader}>
+        <h1 className={styles.title}>Dashboard</h1>
+      </div>
+  
       <div className={styles.grid}>
         {modules.map((module, index) => (
           <Link key={index} href={module.path} className={styles.card}>
@@ -39,4 +59,5 @@ export default function Home1() {
       </div>
     </div>
   );
+  
 }

@@ -14,6 +14,8 @@ import {
   Mail,
   LogOut,
 } from "lucide-react";
+import image from "../../public/chesschamps.png";
+import Image from "next/image";
 
 import "../styles/withSidebar.scss";
 
@@ -60,6 +62,16 @@ export default function Sidebar() {
   return (
     <>
       <aside className="sidebar">
+      <div className="sidebar-logo">
+  <Image
+    src="/chesschamps.png"
+    alt="Chess for Kids Logo"
+    width={60}
+    height={60}
+    style={{ borderRadius: "50%", boxShadow: "0 0 6px rgba(0,0,0,0.5)" }}
+  />
+</div>
+
         <div className="sidebar-links">
           {modules.map((mod, i) => {
             const isActive = pathname === mod.path;
