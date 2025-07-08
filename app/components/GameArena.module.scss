@@ -1,0 +1,74 @@
+.gameArenaContainer {
+    padding: 2rem;
+    background-color: white;
+    color: black;
+  }
+  
+  .sectionTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .topStats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 2rem;
+  }
+  
+  .cardLeft, .cardRight {
+    flex: 1;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .bigStat {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .bottomStats span {
+    display: block;
+    margin-top: 0.5rem;
+  }
+  
+  .time {
+    font-size: 20px;
+    margin-top: 1rem;
+  }
+  
+  .section {
+    margin-top: 2rem;
+  }
+  
+  .breakdown {
+    display: flex;
+    gap: 2rem;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    align-items: flex-start;
+  }
+  
+  .breakdown p {
+    margin: 4px 0;
+  }
+  
+  .statValue {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .chartIcon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  

@@ -1,0 +1,108 @@
+.tournamentContainer {
+    padding: 2rem;
+    background-color: white;
+    color: black;
+  }
+  
+  .topStats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .leftCard, .rightCard {
+    flex: 1;
+    background: #f8f8f8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .bigStat {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 1rem 0;
+  }
+  
+  .bottom span {
+    display: block;
+  }
+  
+  .rankings {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .rankBox {
+    background-color: #f5f8fb;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  .section {
+    margin-top: 2rem;
+  }
+  
+  .breakdown {
+    display: flex;
+    gap: 2rem;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .statValue {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .chartIcon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .legend {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+  
+  .legend div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .green { width: 12px; height: 12px; background: green; display: inline-block; border-radius: 50%; }
+  .red { width: 12px; height: 12px; background: red; display: inline-block; border-radius: 50%; }
+  .yellow { width: 12px; height: 12px; background: orange; display: inline-block; border-radius: 50%; }
+  
+  .table {
+    background-color: #f5f8fb;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .tableHeader {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .noData {
+    text-align: center;
+    padding: 2rem;
+    color: #777;
+  }
+  
