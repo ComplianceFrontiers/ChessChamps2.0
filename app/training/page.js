@@ -34,6 +34,8 @@ const Training = () => {
     { date: '31-July-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov' },
   ];
 
+  const registeredSessions = [...upcomingSessions]; // Reuse for now — kids registered
+
   const pastSessions = [
     { date: '25-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'present' },
     { date: '27-Jun-2025', topic: 'Basics of Chess', coach: 'GM Sergey Kasparov', status: 'absent' },
@@ -53,6 +55,12 @@ const Training = () => {
           Upcoming Sessions
         </span>
         <span
+          className={activeTab === 'registered' ? styles.active : ''}
+          onClick={() => setActiveTab('registered')}
+        >
+          Registered Sessions
+        </span>
+        <span
           className={activeTab === 'past' ? styles.active : ''}
           onClick={() => setActiveTab('past')}
         >
@@ -62,6 +70,11 @@ const Training = () => {
 
       {activeTab === 'upcoming' &&
         upcomingSessions.map((session, index) => (
+          <SessionCard key={index} session={session} />
+        ))}
+
+      {activeTab === 'registered' &&
+        registeredSessions.map((session, index) => (
           <SessionCard key={index} session={session} />
         ))}
 

@@ -39,7 +39,7 @@ export default function Home1() {
         <Image
           src="/contentbelowlogo.png"
           alt="Chess Kids Playing"
-          width={80}
+          width={150}
           height={100}
           className={styles.belowLogo}
         />

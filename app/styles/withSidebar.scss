@@ -51,9 +51,8 @@
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    border-radius: 50%; /* Make it circular */
-    border: 2px solid #fff;
+    // object-fit: cover;
+    border-radius: 50%; 
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
   }
 }
