@@ -2,26 +2,44 @@
     padding: 2rem;
     background-color: white;
     color: black;
+  
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
   }
   
   .topStats {
     display: flex;
     gap: 2rem;
     margin-bottom: 2rem;
+  
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+    }
   }
   
-  .leftCard, .rightCard {
+  .leftCard,
+  .rightCard {
     flex: 1;
     background: #f8f8f8;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
   }
   
   .bigStat {
     font-size: 32px;
     font-weight: bold;
     margin: 1rem 0;
+  
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
   }
   
   .bottom span {
@@ -33,6 +51,12 @@
     justify-content: center;
     gap: 2rem;
     margin-bottom: 2rem;
+  
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
   }
   
   .rankBox {
@@ -55,11 +79,20 @@
     padding: 1.5rem;
     align-items: flex-start;
     flex-wrap: wrap;
+  
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+    }
   }
   
   .statValue {
     font-size: 24px;
     font-weight: bold;
+  
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
   }
   
   .chartIcon {
@@ -81,15 +114,36 @@
     gap: 0.5rem;
   }
   
-  .green { width: 12px; height: 12px; background: green; display: inline-block; border-radius: 50%; }
-  .red { width: 12px; height: 12px; background: red; display: inline-block; border-radius: 50%; }
-  .yellow { width: 12px; height: 12px; background: orange; display: inline-block; border-radius: 50%; }
+  .green,
+  .red,
+  .yellow {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 50%;
+  }
+  
+  .green {
+    background: green;
+  }
+  
+  .red {
+    background: red;
+  }
+  
+  .yellow {
+    background: orange;
+  }
   
   .table {
     background-color: #f5f8fb;
     border-radius: 10px;
     padding: 1rem;
     margin-top: 1rem;
+  
+    @media (max-width: 768px) {
+      padding: 0.8rem;
+    }
   }
   
   .tableHeader {
@@ -98,11 +152,21 @@
     font-weight: bold;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #ccc;
+  
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0.3rem;
+      font-size: 0.95rem;
+    }
   }
   
   .noData {
     text-align: center;
     padding: 2rem;
     color: #777;
+  
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
   }
   
