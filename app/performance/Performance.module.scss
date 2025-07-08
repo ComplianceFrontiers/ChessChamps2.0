@@ -1,7 +1,7 @@
 .performanceContainer {
     padding: 2rem;
-    background: #fff;
-    color: #000;
+    background-color: #0d2649;
+    color: white;
     font-family: 'Poppins', sans-serif;
   
     @media (max-width: 768px) {
@@ -30,7 +30,7 @@
       &.active {
         font-weight: bold;
         opacity: 1;
-        border-bottom: 2px solid #000;
+        border-bottom: 2px solid white;
       }
     }
   
@@ -55,13 +55,14 @@
   }
   
   .card {
-    border: 1px solid #eee;
+    border: 1px solid #ccc;
     padding: 1.5rem;
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    background: #f9f9f9;
+    background: #163b6a;
+    color: white;
     margin-bottom: 1rem;
   
     @media (max-width: 768px) {
@@ -70,7 +71,9 @@
     }
   }
   
-  .left, .middle, .chartBox {
+  .left,
+  .middle,
+  .chartBox {
     flex: 1;
     min-width: 200px;
     display: flex;
@@ -96,7 +99,9 @@
     }
   }
   
-  .green, .red, .yellow {
+  .green,
+  .red,
+  .yellow {
     width: 10px;
     height: 10px;
     display: inline-block;
@@ -121,7 +126,7 @@
     justify-content: space-around;
     margin-top: 2rem;
     padding: 1rem;
-    background: #f2f6fa;
+    background: #1e3f6e;
     border-radius: 10px;
   
     @media (max-width: 768px) {

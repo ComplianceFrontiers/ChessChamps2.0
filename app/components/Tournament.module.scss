@@ -1,7 +1,7 @@
 .tournamentContainer {
     padding: 2rem;
-    background-color: white;
-    color: black;
+    background-color: #0d2649;
+    color: white;
   
     @media (max-width: 768px) {
       padding: 1rem;
@@ -22,10 +22,11 @@
   .leftCard,
   .rightCard {
     flex: 1;
-    background: #f8f8f8;
+    background: #1e3f6e;
+    color: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   
     @media (max-width: 768px) {
       padding: 1rem;
@@ -60,7 +61,8 @@
   }
   
   .rankBox {
-    background-color: #f5f8fb;
+    background-color: #2a4e7e;
+    color: white;
     border-radius: 12px;
     padding: 1rem;
     text-align: center;
@@ -74,7 +76,8 @@
   .breakdown {
     display: flex;
     gap: 2rem;
-    background-color: #f8f8f8;
+    background-color: #1e3f6e;
+    color: white;
     border-radius: 12px;
     padding: 1.5rem;
     align-items: flex-start;
@@ -136,7 +139,8 @@
   }
   
   .table {
-    background-color: #f5f8fb;
+    background-color: #2a4e7e;
+    color: white;
     border-radius: 10px;
     padding: 1rem;
     margin-top: 1rem;
@@ -163,7 +167,7 @@
   .noData {
     text-align: center;
     padding: 2rem;
-    color: #777;
+    color: #ccc;
   
     @media (max-width: 768px) {
       padding: 1rem;

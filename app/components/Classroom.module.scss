@@ -1,7 +1,7 @@
 .classroomContainer {
   padding: 2rem;
-  background: #fff;
-  color: #000;
+  background-color: #0d2649;
+  color: white;
   font-family: 'Poppins', sans-serif;
 
   @media (max-width: 768px) {
@@ -14,7 +14,7 @@
   gap: 2rem;
   font-size: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ccc;
   padding-bottom: 1rem;
 
   span {
@@ -61,8 +61,9 @@
 .card {
   flex: 1;
   min-width: 300px;
-  background: #f9f9f9;
-  border: 1px solid #eee;
+  background: #163b6a;
+  border: 1px solid #2d4a73;
+  color: white;
   border-radius: 10px;
   padding: 1.2rem;
   display: flex;
@@ -90,7 +91,7 @@
 
 .label {
   font-weight: bold;
-  color: #888;
+  color: #ccc;
   font-size: 0.9rem;
 }
 
@@ -107,7 +108,7 @@
 .cardBottom {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #466692;
   padding-top: 1rem;
 
   @media (max-width: 768px) {
@@ -121,7 +122,7 @@
     p {
       margin: 0;
       font-size: 0.85rem;
-      color: gray;
+      color: #ccc;
     }
 
     span {
@@ -137,10 +138,10 @@
 
 .medalsSection {
   margin-top: 2rem;
-  background: #f6f9ff;
+  background: #1e3f6e;
   border-radius: 10px;
   padding: 1rem 1.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #355a88;
 
   @media (max-width: 768px) {
     padding: 1rem;

@@ -1,7 +1,7 @@
 .gameArenaContainer {
     padding: 2rem;
-    background-color: white;
-    color: black;
+    background-color: #0d2649;
+    color: white;
   
     @media (max-width: 768px) {
       padding: 1rem;
@@ -33,10 +33,11 @@
   
   .cardLeft, .cardRight {
     flex: 1;
-    background-color: #f8f8f8;
+    background-color: #1e3f6e;
+    color: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   
     @media (max-width: 768px) {
       padding: 1rem;
@@ -87,10 +88,11 @@
   .breakdown {
     display: flex;
     gap: 2rem;
-    background-color: #f8f8f8;
+    background-color: #1e3f6e;
+    color: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     align-items: flex-start;
   
     @media (max-width: 768px) {
