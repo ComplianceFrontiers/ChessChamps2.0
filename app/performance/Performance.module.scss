@@ -61,8 +61,8 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    background: #163b6a;
-    color: white;
+    background: white;
+    color: black; // change text color for white background
     margin-bottom: 1rem;
   
     @media (max-width: 768px) {
