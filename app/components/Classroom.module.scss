@@ -61,10 +61,11 @@
 .card {
   flex: 1;
   min-width: 300px;
-  background: #163b6a;
+  background: #f8f8f8;
   border: 1px solid #2d4a73;
-  color: white;
+  color: rgb(0, 0, 0);
   border-radius: 10px;
+  gap: 1rem;
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
@@ -91,7 +92,7 @@
 
 .label {
   font-weight: bold;
-  color: #ccc;
+  color: #000000;
   font-size: 0.9rem;
 }
 

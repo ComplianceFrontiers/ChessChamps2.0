@@ -33,8 +33,8 @@
   
   .cardLeft, .cardRight {
     flex: 1;
-    background-color: #1e3f6e;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -88,8 +88,8 @@
   .breakdown {
     display: flex;
     gap: 2rem;
-    background-color: #1e3f6e;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
