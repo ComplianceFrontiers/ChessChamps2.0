@@ -1,6 +1,3 @@
-
-
-
 "use client";
 import { useState, useEffect } from 'react';
 import { Chess } from 'chess.js';

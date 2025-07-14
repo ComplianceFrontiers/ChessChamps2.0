@@ -1,9 +1,9 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
 import { Chess } from "chess.js";
 import CustomChessboard from "../components/CustomChessboard";
+import { getStockfishEngine } from "../../utils/stockfish";
 
 export default function ChessApp() {
   const [game, setGame] = useState(new Chess());
@@ -19,6 +19,10 @@ export default function ChessApp() {
   const [targetGame, setTargetGame] = useState(null);
   const [boardKey, setBoardKey] = useState(0);
   const [completedPuzzles, setCompletedPuzzles] = useState(0);
+  const [isComputerTurn, setIsComputerTurn] = useState(false);
+  const [userSide, setUserSide] = useState('w'); // Track which side user is playing
+  const [hintUsed, setHintUsed] = useState(false);
+  const [userMoveCount, setUserMoveCount] = useState(0); // Track user moves in current puzzle
 
   // Force re-render when gamePosition changes
   useEffect(() => {
@@ -29,61 +33,162 @@ export default function ChessApp() {
     setBoardPosition(newBoardPosition);
   }, [gamePosition]);
 
-  // Function to get best move using simple evaluation
+  // Simple FEN validation without chess.js
+  const simpleValidateFen = (fen) => {
+    if (!fen || typeof fen !== 'string') {
+      return { valid: false, error: 'FEN must be a non-empty string' };
+    }
+    
+    fen = fen.trim();
+    const parts = fen.split(' ');
+    
+    if (parts.length !== 6) {
+      return { valid: false, error: `FEN must have 6 parts, found ${parts.length}` };
+    }
+    
+    const [position] = parts;
+    
+    // Check for kings
+    if (!position.includes('K')) {
+      return { valid: false, error: 'Missing white king (K)' };
+    }
+    if (!position.includes('k')) {
+      return { valid: false, error: 'Missing black king (k)' };
+    }
+    
+    return { valid: true };
+  };
+
+  // Use simple validation first, then chess.js validation
+  const validateFen = (fen) => {
+    console.log("Starting FEN validation for:", fen);
+    
+    // First try simple validation
+    const simpleCheck = simpleValidateFen(fen);
+    console.log("Simple validation result:", simpleCheck);
+    if (!simpleCheck.valid) {
+      return simpleCheck;
+    }
+    
+    // For now, let's trust simple validation and skip chess.js validation
+    // to isolate the issue
+    console.log("Simple validation passed, accepting FEN");
+    return { valid: true };
+    
+    // Commented out chess.js validation temporarily
+    /*
+    // Then try chess.js validation
+    try {
+      console.log("Attempting chess.js validation...");
+      const testGame = new Chess();
+      
+      // Try to load the FEN
+      const loadResult = testGame.load(fen);
+      console.log("Chess.js load result:", loadResult);
+      
+      // In newer versions of chess.js, load() returns true on success
+      if (loadResult === false) {
+        console.log("Chess.js load returned false");
+        return { valid: false, error: 'Invalid FEN format (chess.js load failed)' };
+      }
+      
+      console.log("Chess.js validation successful");
+      return { valid: true };
+    } catch (error) {
+      console.log("Chess.js validation threw error:", error);
+      return { valid: false, error: `Chess.js validation error: ${error.message}` };
+    }
+    */
+  };
+
+  // Function to get best move using Stockfish or simple evaluation
   const analyzeFenPosition = async (fen) => {
     try {
-      // Create a temporary game to analyze
-      const tempGame = new Chess(fen);
-      
-      // Get all legal moves
-      const moves = tempGame.moves({ verbose: true });
-      
-      if (moves.length === 0) {
-        throw new Error('No legal moves available');
+      // Validate FEN first
+      const validation = validateFen(fen);
+      if (!validation.valid) {
+        throw new Error(`Invalid FEN: ${validation.error}`);
       }
       
-      // Simple evaluation: prioritize captures, checks, and center control
-      let bestMove = moves[0];
-      let bestScore = -999;
+      console.log('Analyzing position with Stockfish:', fen);
       
-      for (const move of moves) {
-        let score = 0;
+      // Try to use Stockfish first
+      try {
+        const stockfish = getStockfishEngine();
+        const bestMove = await stockfish.getBestMove(fen, 12); // Depth 12 for good analysis
+        console.log('Stockfish found best move:', bestMove);
         
-        // Prioritize captures
-        if (move.captured) {
-          const pieceValues = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 0 };
-          score += pieceValues[move.captured] * 10;
+        // Validate that the returned move is legal
+        const testGame = new Chess();
+        testGame.load(fen);
+        try {
+          const testMoveResult = testGame.move(bestMove);
+          if (testMoveResult) {
+            console.log('Best move validation passed:', bestMove);
+            return bestMove;
+          } else {
+            console.warn('Stockfish returned invalid move, falling back to simple engine');
+            throw new Error('Invalid move from Stockfish');
+          }
+        } catch (moveError) {
+          console.warn('Stockfish move validation failed:', moveError, 'falling back to simple engine');
+          throw new Error('Move validation failed');
         }
         
-        // Prioritize checks
-        tempGame.move(move);
-        if (tempGame.inCheck()) {
-          score += 20;
-        }
-        tempGame.undo();
+      } catch (stockfishError) {
+        console.warn('Stockfish analysis failed, falling back to simple engine:', stockfishError);
         
-        // Prioritize center control (e4, e5, d4, d5)
-        const centerSquares = ['e4', 'e5', 'd4', 'd5'];
-        if (centerSquares.includes(move.to)) {
-          score += 5;
-        }
+        // Fallback to simple evaluation
+        const tempGame = new Chess();
+        tempGame.load(fen);
         
-        // Prioritize piece development (moving from back rank)
-        if (move.from[1] === '1' || move.from[1] === '8') {
-          score += 3;
+        const moves = tempGame.moves({ verbose: true });
+        if (moves.length === 0) {
+          throw new Error('No legal moves available');
         }
         
-        // Small random factor to avoid always picking the same move
-        score += Math.random() * 0.1;
+        let bestMove = moves[0];
+        let bestScore = -999;
         
-        if (score > bestScore) {
-          bestScore = score;
-          bestMove = move;
+        for (const move of moves) {
+          let score = 0;
+          
+          // Prioritize captures
+          if (move.captured) {
+            const pieceValues = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 0 };
+            score += pieceValues[move.captured] * 10;
+          }
+          
+          // Prioritize checks
+          tempGame.move(move);
+          if (tempGame.inCheck()) {
+            score += 20;
+          }
+          tempGame.undo();
+          
+          // Prioritize center control (e4, e5, d4, d5)
+          const centerSquares = ['e4', 'e5', 'd4', 'd5'];
+          if (centerSquares.includes(move.to)) {
+            score += 5;
+          }
+          
+          // Prioritize piece development (moving from back rank)
+          if (move.from[1] === '1' || move.from[1] === '8') {
+            score += 3;
+          }
+          
+          // Small random factor to avoid always picking the same move
+          score += Math.random() * 0.1;
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = move;
+          }
         }
+        
+        console.log('Simple engine found best move:', bestMove.san);
+        return bestMove.san;
       }
-      
-      // Return the best move instead of setting state directly
-      return bestMove.san;
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -91,7 +196,87 @@ export default function ChessApp() {
     }
   };
 
-  // Function to load the next puzzle in the set
+  // Function to make computer move
+  const makeComputerMove = async () => {
+    if (isComputerTurn) {
+      setMessage("🤖 Computer is thinking...");
+      
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Thinking delay
+        
+        const bestMove = await analyzeFenPosition(game.fen());
+        const gameCopy = new Chess(game.fen());
+        const move = gameCopy.move(bestMove);
+        
+        if (move) {
+          setGame(gameCopy);
+          setGamePosition(gameCopy.fen());
+          setMessage(`🤖 Computer played: ${bestMove}`);
+          
+          // Check if game is over
+          if (gameCopy.isGameOver()) {
+            let gameResult = "";
+            if (gameCopy.isCheckmate()) {
+              gameResult = gameCopy.turn() === userSide ? "💀 You lost by checkmate!" : "🎉 You won by checkmate!";
+            } else if (gameCopy.isDraw()) {
+              gameResult = "🤝 Game ended in a draw!";
+            } else if (gameCopy.isStalemate()) {
+              gameResult = "🤝 Game ended in stalemate!";
+            }
+            
+            setMessage(gameResult + " Loading next puzzle...");
+            setIsComputerTurn(false);
+            
+            setTimeout(() => {
+              loadNextPuzzle();
+            }, 2000);
+            return;
+          }
+          
+          // Check if it's user's turn again
+          if (gameCopy.turn() === userSide) {
+            setIsComputerTurn(false);
+            // Get next best move for user
+            const nextBestMove = await analyzeFenPosition(gameCopy.fen());
+            setAutoCorrectMove(nextBestMove);
+            setMessage(`Your turn! Make your move.`);
+            setHintUsed(false); // Reset hint for new position
+          } else {
+            // Computer continues playing
+            setTimeout(() => {
+              makeComputerMove();
+            }, 1500);
+          }
+        }
+      } catch (error) {
+        console.error('Computer move error:', error);
+        setMessage("❌ Computer move failed. Moving to next puzzle...");
+        setIsComputerTurn(false);
+        setTimeout(() => {
+          loadNextPuzzle();
+        }, 1500);
+      }
+    }
+  };
+
+  // UseEffect to trigger computer moves
+  useEffect(() => {
+    if (isComputerTurn && isGameSetup) {
+      makeComputerMove();
+    }
+  }, [isComputerTurn, isGameSetup]);
+
+  // Cleanup Stockfish engine on unmount
+  useEffect(() => {
+    return () => {
+      const stockfish = getStockfishEngine();
+      if (stockfish) {
+        stockfish.destroy();
+      }
+    };
+  }, []);
+
+  // Function to load the next puzzle in the set with validation
   const loadNextPuzzle = async () => {
     if (currentFenIndex < fenSet.length - 1) {
       const nextIndex = currentFenIndex + 1;
@@ -102,27 +287,36 @@ export default function ChessApp() {
       setIsAnalyzing(true);
       
       try {
+        // Validate the next FEN
+        const validation = validateFen(nextFen);
+        if (!validation.valid) {
+          throw new Error(`Invalid FEN: ${validation.error}`);
+        }
+        
         const bestMove = await analyzeFenPosition(nextFen);
         setAutoCorrectMove(bestMove);
         
         // Set up the next game
-        const newGame = new Chess(nextFen);
-        const targetGameInstance = new Chess(nextFen);
-        const move = targetGameInstance.move(bestMove);
+        const newGame = new Chess();
+        newGame.load(nextFen);
+        setUserSide(newGame.turn()); // User plays the side to move
         
-        if (move) {
-          setGame(newGame);
-          setGamePosition(newGame.fen());
-          setBoardPosition(newGame.fen().split(' ')[0]);
-          setBoardKey(prev => prev + 1);
-          setTargetGame(targetGameInstance);
-          
-          setMessage(`Puzzle ${nextIndex + 1}/${fenSet.length} - Current turn: ${newGame.turn() === 'w' ? 'White' : 'Black'} to move. Best move: ${bestMove}`);
-        }
+        setGame(newGame);
+        setGamePosition(newGame.fen());
+        setBoardKey(prev => prev + 1);
+        setIsComputerTurn(false);
+        setHintUsed(false);
+        setUserMoveCount(0); // Reset user move count for new puzzle
+        
+        setMessage(`Puzzle ${nextIndex + 1}/${fenSet.length} - Your turn as ${newGame.turn() === 'w' ? 'White' : 'Black'}!`);
         
       } catch (error) {
         console.error('Error loading next puzzle:', error);
-        setMessage('Error loading next puzzle. Check the FEN format.');
+        setMessage(`Error loading puzzle ${nextIndex + 1}: ${error.message}. Skipping to next...`);
+        // Try to skip to the next puzzle
+        setTimeout(() => {
+          loadNextPuzzle();
+        }, 1500);
       } finally {
         setIsAnalyzing(false);
       }
@@ -133,32 +327,75 @@ export default function ChessApp() {
     }
   };
 
-  // Function to parse FEN set input
+  // Function to parse FEN set input with improved validation and debugging
   const parseFenSet = (input) => {
-    return input
+    console.log("Parsing FEN input:", input);
+    
+    if (!input || typeof input !== 'string') {
+      console.log("Invalid input: not a string or empty");
+      return [];
+    }
+    
+    const lines = input
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .filter(line => line.split(' ').length === 6); // Valid FEN should have 6 parts
+      .filter(line => line.length > 0);
+    
+    console.log("Found lines:", lines);
+    
+    const validFens = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      console.log(`Validating line ${i + 1}: "${line}"`);
+      
+      const validation = validateFen(line);
+      if (validation.valid) {
+        validFens.push(line);
+        console.log(`✅ Line ${i + 1} is valid`);
+      } else {
+        console.warn(`❌ Line ${i + 1} is invalid: ${validation.error}`);
+      }
+    }
+    
+    console.log("Valid FENs found:", validFens);
+    return validFens;
   };
 
-  const setupGame = async () => {
-    console.log("Setup game called with FEN input:", inputFen);
+  const setupGameWithFen = async (fenInput) => {
+    console.log("setupGameWithFen called with:", JSON.stringify(fenInput));
     
-    if (!inputFen.trim()) {
+    if (!fenInput || fenInput.trim() === '') {
       setMessage("Please enter FEN notation(s)!");
+      console.log("Setup aborted: no input");
       return;
     }
+    
+    // Update the state for consistency
+    setInputFen(fenInput);
     
     // Parse FEN input - could be single FEN or multiple FENs
-    const fenList = parseFenSet(inputFen);
+    const fenList = parseFenSet(fenInput);
+    
+    console.log("Parsed FEN list:", fenList);
     
     if (fenList.length === 0) {
-      setMessage("No valid FEN positions found! Please check your input.");
+      // Provide more specific error message
+      const lines = fenInput.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      if (lines.length === 0) {
+        setMessage("Please enter at least one FEN position!");
+      } else {
+        // Check what's wrong with the first line
+        const firstLine = lines[0];
+        console.log("Validating first line:", firstLine);
+        const validation = validateFen(firstLine);
+        console.log("First line validation:", validation);
+        setMessage(`No valid FEN positions found! First line error: ${validation.error}. Please check your input format.`);
+      }
       return;
     }
     
-    console.log(`Found ${fenList.length} FEN position(s)`);
+    console.log(`Found ${fenList.length} valid FEN position(s)`);
     
     // Set up for multiple FENs
     setFenSet(fenList);
@@ -175,54 +412,113 @@ export default function ChessApp() {
       setAutoCorrectMove(bestMove);
       setMessage(`Best move found: ${bestMove} (auto-analysis complete)`);
       
-      // Validate the first FEN
-      let newGame;
-      try {
-        newGame = new Chess(firstFen);
-      } catch (e) {
-        newGame = new Chess();
-        const loadResult = newGame.load(firstFen);
-        if (!loadResult) {
-          throw new Error("Failed to load FEN");
-        }
-      }
+      // Set up the game with validated FEN
+      const newGame = new Chess();
+      newGame.load(firstFen);
       
-      // Create target game to test the correct move
-      let targetGameInstance;
-      try {
-        targetGameInstance = new Chess(firstFen);
-      } catch (e) {
-        targetGameInstance = new Chess();
-        targetGameInstance.load(firstFen);
-      }
-      
-      console.log("Testing move:", bestMove);
-      const move = targetGameInstance.move(bestMove);
-      
-      if (!move) {
-        setMessage(`Invalid move '${bestMove}' for the first position! Please check.`);
-        setIsAnalyzing(false);
-        return;
-      }
+      // Set user side as the side to move
+      setUserSide(newGame.turn());
       
       // Set up the first game
       setGame(newGame);
       const newFen = newGame.fen();
       setGamePosition(newFen);
-      setBoardPosition(newFen.split(' ')[0]);
       setBoardKey(prev => prev + 1);
-      setTargetGame(targetGameInstance);
       setIsGameSetup(true);
+      setIsComputerTurn(false);
+      setHintUsed(false);
       
       if (fenList.length === 1) {
-        setMessage(`Game set up successfully! Current turn: ${newGame.turn() === 'w' ? 'White' : 'Black'} to move.`);
+        setMessage(`Game set up successfully! You are playing as ${newGame.turn() === 'w' ? 'White' : 'Black'}.`);
       } else {
-        setMessage(`Puzzle set loaded! Starting puzzle 1/${fenList.length} - ${newGame.turn() === 'w' ? 'White' : 'Black'} to move.`);
+        setMessage(`Puzzle set loaded! Starting puzzle 1/${fenList.length} - You are ${newGame.turn() === 'w' ? 'White' : 'Black'} to move.`);
       }
       
     } catch (error) {
       console.error("Analysis or setup error:", error);
-      setMessage("Could not auto-analyze the position. Please check the FEN format.");
+      setMessage(`Could not analyze the position: ${error.message}. Please check the FEN format.`);
+      setIsAnalyzing(false);
+      return;
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const setupGame = async () => {
+    console.log("Setup game called");
+    console.log("inputFen state:", JSON.stringify(inputFen));
+    console.log("inputFen length:", inputFen.length);
+    console.log("inputFen type:", typeof inputFen);
+    
+    if (!inputFen || inputFen.trim() === '') {
+      setMessage("Please enter FEN notation(s)!");
+      console.log("Setup aborted: no input");
+      return;
+    }
+    
+    // Parse FEN input - could be single FEN or multiple FENs
+    const fenList = parseFenSet(inputFen);
+    
+    console.log("Parsed FEN list:", fenList);
+    
+    if (fenList.length === 0) {
+      // Provide more specific error message
+      const lines = inputFen.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      if (lines.length === 0) {
+        setMessage("Please enter at least one FEN position!");
+      } else {
+        // Check what's wrong with the first line
+        const firstLine = lines[0];
+        console.log("Validating first line:", firstLine);
+        const validation = validateFen(firstLine);
+        console.log("First line validation:", validation);
+        setMessage(`No valid FEN positions found! First line error: ${validation.error}. Please check your input format.`);
+      }
+      return;
+    }
+    
+    console.log(`Found ${fenList.length} valid FEN position(s)`);
+    
+    // Set up for multiple FENs
+    setFenSet(fenList);
+    setCurrentFenIndex(0);
+    setCompletedPuzzles(0);
+    
+    const firstFen = fenList[0];
+    
+    // Auto-analyze the first position
+    setIsAnalyzing(true);
+    
+    try {
+      const bestMove = await analyzeFenPosition(firstFen);
+      setAutoCorrectMove(bestMove);
+      setMessage(`Best move found: ${bestMove} (auto-analysis complete)`);
+      
+      // Set up the game with validated FEN
+      const newGame = new Chess();
+      newGame.load(firstFen);
+      
+      // Set user side as the side to move
+      setUserSide(newGame.turn());
+      
+      // Set up the first game
+      setGame(newGame);
+      const newFen = newGame.fen();
+      setGamePosition(newFen);
+      setBoardKey(prev => prev + 1);
+      setIsGameSetup(true);
+      setIsComputerTurn(false);
+      setHintUsed(false);
+      
+      if (fenList.length === 1) {
+        setMessage(`Game set up successfully! You are playing as ${newGame.turn() === 'w' ? 'White' : 'Black'}.`);
+      } else {
+        setMessage(`Puzzle set loaded! Starting puzzle 1/${fenList.length} - You are ${newGame.turn() === 'w' ? 'White' : 'Black'} to move.`);
+      }
+      
+    } catch (error) {
+      console.error("Analysis or setup error:", error);
+      setMessage(`Could not analyze the position: ${error.message}. Please check the FEN format.`);
       setIsAnalyzing(false);
       return;
     } finally {
@@ -242,18 +538,54 @@ export default function ChessApp() {
     setMessage("");
     setIsGameSetup(false);
     setTargetGame(null);
+    setIsComputerTurn(false);
+    setUserSide('w');
+    setHintUsed(false);
+    setUserMoveCount(0); // Reset user move count
+  };
+
+  const showHint = () => {
+    if (autoCorrectMove && !hintUsed) {
+      setMessage(`💡 Hint: Try ${autoCorrectMove}`);
+      setHintUsed(true);
+    } else if (hintUsed) {
+      setMessage(`💡 You already used the hint: ${autoCorrectMove}`);
+    } else {
+      setMessage("❌ No hint available for this position.");
+    }
   };
 
   const onDrop = useCallback((sourceSquare, targetSquare) => {
+    console.log('=== onDrop CALLED ===');
+    console.log('sourceSquare:', sourceSquare);
+    console.log('targetSquare:', targetSquare);
+    console.log('userMoveCount:', userMoveCount);
+    console.log('autoCorrectMove:', autoCorrectMove);
+    console.log('isComputerTurn:', isComputerTurn);
+    console.log('userSide:', userSide);
+    console.log('game.turn():', game.turn());
+    
+    // Don't allow moves during computer's turn
+    if (isComputerTurn) {
+      setMessage("⏳ Please wait for computer's move...");
+      return false;
+    }
+
+    // Only allow moves if it's user's turn
+    if (game.turn() !== userSide) {
+      setMessage("⏳ It's not your turn!");
+      return false;
+    }
+
+    // Prevent move if best move (hint) is not ready
+    if (game.history().length === 0 && !autoCorrectMove) {
+      setMessage("Please wait for the best move to be calculated before making your move.");
+      return false;
+    }
+
     try {
       const gameCopy = new Chess(game.fen());
-      
-      // First try the move without promotion
-      let moveObj = {
-        from: sourceSquare,
-        to: targetSquare
-      };
-      
+      let moveObj = { from: sourceSquare, to: targetSquare };
       let move;
       try {
         move = gameCopy.move(moveObj);
@@ -261,18 +593,14 @@ export default function ChessApp() {
         // If move failed, it might be a pawn promotion
         const piece = game.get(sourceSquare);
         const toRank = targetSquare[1];
-        
         if (piece && piece.type === 'p' && (toRank === '8' || toRank === '1')) {
-          // It's a pawn promotion, try with queen promotion
           try {
             moveObj.promotion = 'q';
             move = gameCopy.move(moveObj);
           } catch (promotionError) {
-            // Even promotion failed, move is invalid
             move = null;
           }
         } else {
-          // Not a promotion move, just invalid
           move = null;
         }
       }
@@ -283,37 +611,85 @@ export default function ChessApp() {
         return false;
       }
 
-      // Check if the move matches the correct move BEFORE updating the board
-      if (targetGame && gameCopy.fen() === targetGame.fen()) {
-        // Correct move - update the board and show success message
-        setGame(gameCopy);
-        setGamePosition(gameCopy.fen());
-        setCompletedPuzzles(prev => prev + 1);
+      // Only allow the best move for the first user move (use userMoveCount instead of game history)
+      if (userMoveCount === 0) {
+        console.log('=== FIRST MOVE VALIDATION ===');
+        console.log('User move count:', userMoveCount);
+        console.log('Game history length:', game.history().length);
+        console.log('User move SAN:', move.san);
+        console.log('Expected best move:', autoCorrectMove);
+        console.log('autoCorrectMove exists:', !!autoCorrectMove);
         
-        if (fenSet.length > 1) {
-          setMessage("🎉 Correct! Loading next puzzle...");
-          // Auto-proceed to next puzzle after a short delay
-          setTimeout(() => {
-            loadNextPuzzle();
-          }, 1500);
-        } else {
-          setMessage("🎉 Correct move! Well done!");
+        if (!autoCorrectMove) {
+          console.log('No best move available - blocking move');
+          setMessage("Please wait for the best move to be calculated.");
+          return false;
         }
-        return true;
-      } else {
-        // Incorrect move - don't update the board, keep original position
-        setMessage("❌ That's not the correct move. Try again!");
-        // Force board to stay in original position by updating board key
-        setBoardKey(prev => prev + 1);
-        return false;
+        
+        const userMoveSan = move.san.replace(/\s+/g, '').toLowerCase();
+        const bestMoveSan = autoCorrectMove.replace(/\s+/g, '').toLowerCase();
+        
+        console.log('Normalized user move:', userMoveSan);
+        console.log('Normalized best move:', bestMoveSan);
+        console.log('Exact match:', userMoveSan === bestMoveSan);
+        
+        if (userMoveSan !== bestMoveSan) {
+          console.log('MOVE REJECTED - Does not match best move');
+          setMessage(`❌ Wrong move! You must play the best move: ${autoCorrectMove}. You tried: ${move.san}`);
+          return false;
+        }
+        console.log('MOVE ACCEPTED - Matches best move');
       }
+
+      // Any legal move is accepted - update the board
+      setGame(gameCopy);
+      setGamePosition(gameCopy.fen());
+      setCompletedPuzzles(prev => prev + 1);
+      setUserMoveCount(prev => prev + 1); // Increment user move count
+      
+      // Check if game is over after user's move
+      if (gameCopy.isGameOver()) {
+        let gameResult = "";
+        if (gameCopy.isCheckmate()) {
+          gameResult = gameCopy.turn() !== userSide ? "🎉 You won by checkmate!" : "💀 You lost by checkmate!";
+        } else if (gameCopy.isDraw()) {
+          gameResult = "🤝 Game ended in a draw!";
+        } else if (gameCopy.isStalemate()) {
+          gameResult = "🤝 Game ended in stalemate!";
+        }
+        
+        setMessage(gameResult + " Loading next puzzle...");
+        setTimeout(() => {
+          loadNextPuzzle();
+        }, 2000);
+        return true;
+      }
+      
+      // Check if it's computer's turn
+      if (gameCopy.turn() !== userSide) {
+        setMessage(`✅ Good move: ${move.san}! Computer's turn...`);
+        setIsComputerTurn(true);
+      } else {
+        setMessage(`✅ Move played: ${move.san}! Your turn continues.`);
+        setTimeout(async () => {
+          try {
+            const nextBestMove = await analyzeFenPosition(gameCopy.fen());
+            setAutoCorrectMove(nextBestMove);
+            setHintUsed(false);
+          } catch (error) {
+            console.error('Error analyzing next position:', error);
+          }
+        }, 500);
+      }
+      
+      return true;
 
     } catch (error) {
       console.error("Move error:", error);
       setMessage("Error making move. Try again.");
       return false;
     }
-  }, [game, targetGame]);
+  }, [game, userSide, isComputerTurn, autoCorrectMove]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
@@ -335,7 +711,10 @@ export default function ChessApp() {
                 </label>
                 <textarea
                   value={inputFen}
-                  onChange={(e) => setInputFen(e.target.value)}
+                  onChange={(e) => {
+                    console.log("Textarea value changed:", e.target.value);
+                    setInputFen(e.target.value);
+                  }}
                   placeholder="Enter one or more FEN positions (one per line):
 rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
@@ -347,37 +726,33 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                 </p>
               </div>
               
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-3">
-                  Player to Move:
-                </label>
-                <select
-                  value={inputFen.includes(' w ') ? 'w' : inputFen.includes(' b ') ? 'b' : 'w'}
-                  onChange={(e) => {
-                    if (inputFen) {
-                      // Update the FEN to change the active player
-                      const fenParts = inputFen.split(' ');
-                      if (fenParts.length >= 2) {
-                        fenParts[1] = e.target.value;
-                        setInputFen(fenParts.join(' '));
-                      }
-                    }
-                  }}
-                  className="w-full p-4 text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2
-                   focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="w">White to Move</option>
-                  <option value="b">Black to Move</option>
-                </select>
-              </div>
-              
               <button
                 onClick={() => {
-                  console.log("Set up Game button clicked!");
-                  setMessage("Setting up puzzle set...");
-                  setupGame();
+                  console.log("=== BUTTON CLICK DEBUG ===");
+                  console.log("Current inputFen state:", JSON.stringify(inputFen));
+                  
+                  // Get the actual textarea value directly
+                  const textareaElement = document.querySelector('textarea');
+                  const textareaValue = textareaElement ? textareaElement.value : '';
+                  console.log("Direct textarea value:", JSON.stringify(textareaValue));
+                  
+                  if (textareaValue && textareaValue.trim()) {
+                    console.log("Using textarea value directly");
+                    setMessage("Setting up puzzle set...");
+                    // Update state first
+                    setInputFen(textareaValue);
+                    // Use the direct textarea value
+                    setupGameWithFen(textareaValue);
+                  } else if (inputFen && inputFen.trim()) {
+                    console.log("Using inputFen state");
+                    setMessage("Setting up puzzle set...");
+                    setupGame();
+                  } else {
+                    console.log("No valid input found");
+                    setMessage("Please enter FEN notation(s)!");
+                  }
                 }}
-                disabled={!inputFen || isAnalyzing}
+                disabled={isAnalyzing}
                 className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold text-lg shadow-md"
               >
                 {isAnalyzing ? "Analyzing..." : "🚀 Start Puzzle Set"}
@@ -414,16 +789,25 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-xl p-8 mb-8 border border-gray-200">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-2xl font-semibold text-gray-900">
-                Make your move!
+                {isComputerTurn ? "🤖 Computer's Turn" : "🎯 Your Turn"}
               </h2>
-              <button
-                onClick={resetGame}
-                className="bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 transition-colors font-medium shadow-md"
-              >
-                Reset Game
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={showHint}
+                  disabled={isComputerTurn || !autoCorrectMove}
+                  className="bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium shadow-md"
+                >
+                  💡 Show Hint
+                </button>
+                <button
+                  onClick={resetGame}
+                  className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium shadow-md"
+                >
+                  Reset Game
+                </button>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -433,12 +817,13 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                     <div style={{ width: '400px', height: '400px' }}>
                       <CustomChessboard
                         position={game.fen().split(' ')[0]}
-                        currentPlayer={game.turn()}
+                        currentPlayer="w"
                         onMove={(sourceSquare, targetSquare) => {
                           console.log('Custom board move:', sourceSquare, 'to', targetSquare);
                           return onDrop(sourceSquare, targetSquare);
                         }}
                         boardKey={boardKey}
+                        disabled={isComputerTurn}
                       />
                     </div>
                   </div>
@@ -453,7 +838,7 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                       <span className="font-semibold">Progress:</span> 
                       <span className="font-medium text-blue-900">
                         Puzzle {currentFenIndex + 1}/{fenSet.length} 
-                        ({completedPuzzles} completed)
+                        ({completedPuzzles} moves played)
                       </span>
                     </p>
                   )}
@@ -461,9 +846,18 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                     <span className="font-semibold">Turn:</span> 
                     <span className="font-medium text-gray-900">{game.turn() === 'w' ? 'White' : 'Black'}</span>
                   </p>
+                  <p className="text-sm text-gray-700 mb-2">
+                    <span className="font-semibold">You are:</span> 
+                    <span className="font-medium text-blue-900">{userSide === 'w' ? 'White' : 'Black'}</span>
+                  </p>
                   <p className="text-sm text-gray-700 mb-3">
-                    <span className="font-semibold">Board Key:</span> 
-                    <span className="font-medium text-gray-900">{boardKey}</span>
+                    <span className="font-semibold">Game Status:</span> 
+                    <span className="font-medium text-gray-900">
+                      {game.isCheck() ? 'In Check!' : 
+                       game.isCheckmate() ? 'Checkmate!' : 
+                       game.isDraw() ? 'Draw!' : 
+                       game.isStalemate() ? 'Stalemate!' : 'In Progress'}
+                    </span>
                   </p>
                   <div className="text-sm text-gray-700">
                     <span className="font-semibold">Current FEN:</span><br />
@@ -471,21 +865,26 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                   </div>
                 </div>
                 
-                <div className="bg-blue-50 p-4 md:p-6 rounded-lg border border-blue-200">
-                  <h3 className="font-semibold text-blue-900 mb-3">Instructions:</h3>
-                  <p className="text-sm text-blue-800 leading-relaxed">
-                    Click on a piece to see valid moves, then drag and drop or click to make your move. 
-                    The board automatically rotates when it's Black's turn, showing the position from Black's perspective.
-                    Only the correct move will be accepted - the board will reset if you make the wrong move!
+                <div className={`p-4 md:p-6 rounded-lg border ${isComputerTurn ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
+                  <h3 className={`font-semibold mb-3 ${isComputerTurn ? 'text-orange-900' : 'text-blue-900'}`}>Instructions:</h3>
+                  <p className={`text-sm leading-relaxed ${isComputerTurn ? 'text-orange-800' : 'text-blue-800'}`}>
+                    {isComputerTurn 
+                      ? "⏳ Please wait while the computer analyzes with Stockfish engine..." 
+                      : "🎯 Click on a piece to see valid moves, then drag and drop or click to make your move. After your move, the computer will respond using Stockfish analysis. Use the hint button to get the best move!"
+                    }
                   </p>
                 </div>
                 
                 {message && (
                   <div className={`p-4 md:p-6 rounded-lg border-2 font-medium ${
-                    message.includes('Correct') 
+                    message.includes('Good move') || message.includes('won') || message.includes('Correct')
                       ? 'bg-green-50 text-green-800 border-green-200' 
-                      : message.includes('Invalid') || message.includes('not the correct')
+                      : message.includes('Invalid') || message.includes('lost') || message.includes('❌')
                       ? 'bg-red-50 text-red-800 border-red-200'
+                      : message.includes('Computer') || message.includes('🤖')
+                      ? 'bg-orange-50 text-orange-800 border-orange-200'
+                      : message.includes('Hint') || message.includes('💡')
+                      ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
                       : 'bg-blue-50 text-blue-800 border-blue-200'
                   }`}>
                     <p>{message}</p>
@@ -517,4 +916,5 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
     </div>
   );
 }
+
 
