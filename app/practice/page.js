@@ -174,14 +174,14 @@ export default function ChessApp() {
     }
     
     // 🎯 FORCED MATE IN 2 DETECTION
-    if (gameAfterMove.inCheck()) {
-      const isMateIn2 = testForcedMateIn2(gameAfterMove);
-      if (isMateIn2) {
-        tacticalReasons.push("FORCED MATE IN 2");
-      } else {
-        tacticalReasons.push("CHECK");
-      }
-    }
+    // if (gameAfterMove.inCheck()) {
+    //   const isMateIn2 = testForcedMateIn2(gameAfterMove);
+    //   if (isMateIn2) {
+    //     tacticalReasons.push("FORCED MATE IN 2");
+    //   } else {
+    //     tacticalReasons.push("CHECK");
+    //   }
+    // }
     
     // 💎 MATERIAL ANALYSIS
     if (move && move.captured) {
