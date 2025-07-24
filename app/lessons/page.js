@@ -2,15 +2,14 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // ✅ for App Router
 import styles from './Lessons.module.scss';
 
 export default function Lessons() {
+  const router = useRouter(); // ✅ init router
   const [activeTab, setActiveTab] = useState('available');
+  const currentLevel = 'Pawn';
 
-  // Set current level (change this manually or link with a dropdown)
-  const currentLevel = "Pawn";
-
-  // All levels and their lessons
   const levelLessons = {
     Pawn: [
       "The Board and the Pieces",
@@ -135,18 +134,18 @@ export default function Lessons() {
     ],
   };
 
-  // Map lessons for the selected level
-  const lessonsData = levelLessons[currentLevel].map((title, index) => ({
+const lessonsData = levelLessons[currentLevel].map((title, index) => ({
     id: index + 1,
-    title,
-    category: 'Lesson',
-    level: currentLevel,
-    views: Math.floor(Math.random() * 200 + 50).toString(),
-    type: 'Free',
-    img: '/lessonimages/lesson2.png',
+    title: `Lesson ${index + 1}: ${title}`,
+    length: `${5 + (index % 5)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+    img: `/lessonimages/lesson2.png`,
   }));
 
-  const lessonsToDisplay = lessonsData;
+  const handleStartLesson = (lessonId) => {
+    // redirect to lesson details page
+    router.push(`/lessondetails/${lessonId}`);
+  };
+  
 
   return (
     <div className={styles.lessonContainer}>
@@ -154,54 +153,45 @@ export default function Lessons() {
 
       <div className={styles.tabs}>
         <span
-          className={activeTab === 'available' ? styles.active : ''}
+          className={`${activeTab === 'available' ? styles.active : ''}`}
           onClick={() => setActiveTab('available')}
         >
           Available
         </span>
         <span
-          className={activeTab === 'complete' ? styles.active : ''}
+          className={`${activeTab === 'complete' ? styles.active : ''}`}
           onClick={() => setActiveTab('complete')}
         >
           Complete
         </span>
       </div>
 
-      {lessonsToDisplay.length === 0 ? (
-        <p style={{ color: 'white', textAlign: 'center' }}>No lessons to show.</p>
-      ) : (
-        <div className={styles.grid}>
-          {lessonsToDisplay.map((lesson) => (
-            <div className={styles.card} key={lesson.id}>
-              <div className={styles.lessonImageWrapper}>
-                <Image
-                  src={lesson.img}
-                  alt={lesson.title}
-                  width={300}
-                  height={140}
-                  className={styles.lessonImage}
-                />
-              </div>
-              <div className={styles.lessonInfo}>
-                <span className={styles.category}>{lesson.category}</span>
-                <h3 className={styles.title}>{lesson.title}</h3>
-                <div className={styles.meta}>
-                  <span>{lesson.level}</span>
-                  <span>{lesson.views} views</span>
-                </div>
-                <div className={styles.bottom}>
-                  <span className={styles.free}>{lesson.type}</span>
-                  {activeTab === 'available' ? (
-                    <button className={styles.completeBtn}>MARK COMPLETE</button>
-                  ) : (
-                    <span className={styles.completedLabel}>COMPLETED</span>
-                  )}
-                </div>
-              </div>
+      <div className={styles.moduleTitle}>MODULE 1 | {currentLevel.toUpperCase()} LESSONS</div>
+
+      <div className={styles.grid}>
+        {lessonsData.map((lesson) => (
+          <div className={styles.card} key={lesson.id}>
+            <Image
+              src={lesson.img}
+              alt={lesson.title}
+              width={300}
+              height={160}
+              className={styles.image}
+            />
+            <div className={styles.cardContent}>
+              <p className={styles.length}>Length {lesson.length}</p>
+              <h3 className={styles.title}>{lesson.title}</h3>
+              <p className={styles.desc}>Learn and improve your chess skills with this lesson.</p>
+              <button
+                className={styles.startBtn}
+                onClick={() => handleStartLesson(lesson.id)} // ✅ click handler
+              >
+                START LESSON
+              </button>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

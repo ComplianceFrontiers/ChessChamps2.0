@@ -1,185 +1,137 @@
 .lessonContainer {
-    background-color: #0d2649;
-    color: white;
-    min-height: 100vh;
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-  
-    @media (max-width: 480px) {
-      padding: 1rem;
-    }
+  background-color: #0d2649;
+  color: white;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+
+  @media (max-width: 480px) {
+    padding: 1rem;
   }
-  
-  .heading {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  
+}
+
+.heading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ccc;
+
+  span {
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    padding-bottom: 5px;
+    border-bottom: 3px solid transparent;
+
+    &.active {
+      font-weight: bold;
+      opacity: 1;
+      border-color: white;
+    }
+
     @media (max-width: 480px) {
       font-size: 1rem;
     }
   }
-  
-  .tabs {
-    display: flex;
-    
-    gap: 2rem;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 0.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  
-    span {
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: white;
-      opacity: 0.7;
-  
-      &.active {
-        font-weight: bold;
-        opacity: 1;
-        border-bottom: 3px solid white;
-      }
-  
-      @media (max-width: 480px) {
-        font-size: 1rem;
-      }
-    }
+}
+
+.moduleTitle {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  padding-left: 0.25rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.card {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: scale(1.02);
   }
-  
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1.5rem;
-    justify-content: center;
-    padding-bottom: 2rem;
-  
-    @media (max-width: 1200px) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  
-    @media (max-width: 992px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
   }
-  
-  .card {
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    color: black;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  
-    @media (max-width: 480px) {
-      font-size: 0.9rem;
-    }
-  }
-  
-  .lessonImageWrapper {
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-  }
-  
-  .lessonImage {
-    width: 300px;
-    height: 150px;
-    object-fit: cover;
-    width: 100%;
-    height: auto;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .lessonInfo {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  
-    @media (max-width: 480px) {
-      padding: 0.8rem;
-    }
-  }
-  
-  .category {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: gray;
-  }
-  
-  .title {
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.cardContent {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.length {
+  color: #bbbbbb;
+  font-size: 0.85rem;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+
+  @media (max-width: 480px) {
     font-size: 1rem;
-    font-weight: bold;
-    margin: 0;
-  
-    @media (max-width: 480px) {
-      font-size: 0.95rem;
-    }
   }
-  
-  .meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: gray;
+}
+
+.desc {
+  font-size: 0.85rem;
+  color: #cccccc;
+  line-height: 1.4;
+}
+
+.startBtn {
+  margin-top: 0.5rem;
+  background-color: #f15a24;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background-color: #d94c1a;
   }
-  
-  .bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
-  
-    @media (max-width: 480px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.3rem;
-    }
-  }
-  
-  .free {
-    color: black;
-    font-weight: bold;
-    font-size: 0.8rem;
-  }
-  
-  .completeBtn {
-    background-color: #7ed957;
-    color: white;
-    border: none;
+
+  @media (max-width: 480px) {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  
-    &:hover {
-      background-color: #66c24e;
-    }
-  
-    @media (max-width: 480px) {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.75rem;
-    }
   }
-  .completedLabel {
-    background-color: #6a6aff;
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 0.8rem;
-  }
-  
-  
+}
