@@ -100,9 +100,10 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 1rem;
-  
+    
       button {
-        flex: 1;
+        flex: 1 1 30%;
+        min-width: 150px;
         padding: 0.75rem 1rem;
         font-size: 1rem;
         font-weight: 600;
@@ -110,35 +111,45 @@
         border-radius: 4px;
         cursor: pointer;
         transition: background 0.3s;
+        text-align: center;
       }
-  
+    
       .prevBtn {
         background-color: #003087;
         color: #fff;
-  
+    
         &:hover {
           background-color: #002170;
         }
       }
-  
+    
       .practiceBtn {
         background-color: #1e90ff;
         color: #fff;
-  
+    
         &:hover {
           background-color: #0f78d4;
         }
       }
-  
+    
       .nextBtn {
         background-color: #003087;
         color: #fff;
-  
+    
         &:hover {
           background-color: #002170;
         }
       }
+    
+      @media (max-width: 600px) {
+        flex-direction: column;
+    
+        button {
+          width: 100%;
+        }
+      }
     }
+    
   }
   
   @media (max-width: 768px) {

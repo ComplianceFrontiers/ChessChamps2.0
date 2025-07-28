@@ -1,49 +1,89 @@
 'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import styles from './LessonDetails.module.scss';
+import lessonContent from './lessonData';
 
 const LessonDetail = () => {
+  const router = useRouter();
+  const params = useParams();
+
+  const id = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : '';
+  const lesson = lessonContent[id];
+
+  const lessonKeys = Object.keys(lessonContent);
+  const currentIndex = lessonKeys.indexOf(id);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex < lessonKeys.length - 1;
+
+  if (!lesson) {
+    return <div className={styles.lessonNotFound}>Lesson not found for ID: {id}</div>;
+  }
+
+  const handlePrev = () => {
+    if (hasPrev) {
+      const prevId = lessonKeys[currentIndex - 1];
+      router.push(`/lessondetails/${prevId}`);
+    }
+  };
+
+  const handleNext = () => {
+    if (hasNext) {
+      const nextId = lessonKeys[currentIndex + 1];
+      router.push(`/lessondetails/${nextId}`);
+    }
+  };
+
   return (
     <div className={styles.lessonDetailContainer}>
       <div className={styles.lessonHeader}>
-        <img
-          src="/lessonimages/lessond.png"
-          alt="Lesson Visual"
-          className={styles.lessonImage}
-        />
+        <img src={lesson.image} alt={lesson.title} className={styles.lessonImage} />
       </div>
 
       <div className={styles.lessonBody}>
         <div className={styles.lessonMeta}>
-          <h5>EDITING SECRETS TRAINING & TOOLKIT</h5>
-          <h2>Lesson 1: Welcome</h2>
+          <h5>{lesson.level} Level</h5>
+          <h2>{lesson.title}</h2>
           <div className={styles.lessonInfo}>
-            <span className={styles.duration}>6:58</span>
-            <span className={styles.status}>Completed</span>
+            <span className={styles.duration}>{lesson.duration}</span>
+            <span className={styles.status}>{lesson.status}</span>
           </div>
         </div>
 
-        <p className={styles.lessonDescription}>
-          Learn what Film Editing Pro is all about and hear how our lead trainer, Chris,
-          unlocked the skills that took him from intern to senior editor at a major Hollywood studio.
-        </p>
+        <p className={styles.lessonDescription}>{lesson.description}</p>
 
         <div className={styles.lessonResources}>
           <h4>Lesson Resources</h4>
           <ul>
-            <li>
-              <a href="#">Beginner Course - Premiere Pro Software Quickstart</a>
-            </li>
-            <li>
-              <a href="#">Beginner Course - DaVinci Resolve Software Quickstart</a>
-            </li>
+            {lesson.resources.map((res, index) => (
+              <li key={index}>
+                <a href={res.link} target="_blank" rel="noopener noreferrer">
+                  {res.name}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
         <div className={styles.lessonActions}>
-          <button className={styles.prevBtn}>Previous Lesson</button>
+          <button
+            className={styles.prevBtn}
+            onClick={handlePrev}
+            disabled={!hasPrev}
+          >
+            Previous Lesson
+          </button>
+
           <button className={styles.practiceBtn}>Practice</button>
-          <button className={styles.nextBtn}>Next Lesson</button>
+
+          <button
+            className={styles.nextBtn}
+            onClick={handleNext}
+            disabled={!hasNext}
+          >
+            Next Lesson
+          </button>
         </div>
       </div>
     </div>

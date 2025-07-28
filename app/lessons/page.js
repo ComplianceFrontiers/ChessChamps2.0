@@ -2,13 +2,23 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // ✅ for App Router
+import { useRouter } from 'next/navigation';
 import styles from './Lessons.module.scss';
 
 export default function Lessons() {
-  const router = useRouter(); // ✅ init router
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('available');
-  const currentLevel = 'Pawn';
+  const currentLevel = 'Pawn'; // You can make this dynamic later
+
+  // Map level names to numeric prefixes
+  const levelToIdMap = {
+    Pawn: 1,
+    Knight: 2,
+    Bishop: 3,
+    Rook: 4,
+    Queen: 5,
+    King: 6,
+  };
 
   const levelLessons = {
     Pawn: [
@@ -134,18 +144,20 @@ export default function Lessons() {
     ],
   };
 
-const lessonsData = levelLessons[currentLevel].map((title, index) => ({
-    id: index + 1,
+  // Generate lesson data with dynamic IDs like "1.1", "1.2"
+  const levelId = levelToIdMap[currentLevel];
+  const lessonsData = levelLessons[currentLevel].map((title, index) => ({
+    id: `${levelId}.${index + 1}`,
     title: `Lesson ${index + 1}: ${title}`,
-    length: `${5 + (index % 5)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+    length: `${5 + (index % 5)}:${Math.floor(Math.random() * 60)
+      .toString()
+      .padStart(2, '0')}`,
     img: `/lessonimages/lesson2.png`,
   }));
 
   const handleStartLesson = (lessonId) => {
-    // redirect to lesson details page
     router.push(`/lessondetails/${lessonId}`);
   };
-  
 
   return (
     <div className={styles.lessonContainer}>
@@ -166,7 +178,9 @@ const lessonsData = levelLessons[currentLevel].map((title, index) => ({
         </span>
       </div>
 
-      <div className={styles.moduleTitle}>MODULE 1 | {currentLevel.toUpperCase()} LESSONS</div>
+      <div className={styles.moduleTitle}>
+        MODULE {levelId} | {currentLevel.toUpperCase()} LESSONS
+      </div>
 
       <div className={styles.grid}>
         {lessonsData.map((lesson) => (
@@ -181,10 +195,12 @@ const lessonsData = levelLessons[currentLevel].map((title, index) => ({
             <div className={styles.cardContent}>
               <p className={styles.length}>Length {lesson.length}</p>
               <h3 className={styles.title}>{lesson.title}</h3>
-              <p className={styles.desc}>Learn and improve your chess skills with this lesson.</p>
+              <p className={styles.desc}>
+                Learn and improve your chess skills with this lesson.
+              </p>
               <button
                 className={styles.startBtn}
-                onClick={() => handleStartLesson(lesson.id)} // ✅ click handler
+                onClick={() => handleStartLesson(lesson.id)}
               >
                 START LESSON
               </button>
