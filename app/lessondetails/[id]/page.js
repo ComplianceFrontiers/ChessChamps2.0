@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './LessonDetails.module.scss';
 import lessonContent from './lessonData';
 
@@ -16,6 +16,13 @@ const LessonDetail = () => {
   const currentIndex = lessonKeys.indexOf(id);
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < lessonKeys.length - 1;
+
+  const [status, setStatus] = useState(lesson?.status || 'In Progress');
+
+  useEffect(() => {
+    // Reset status when lesson changes
+    setStatus(lesson?.status || 'In Progress');
+  }, [id]);
 
   if (!lesson) {
     return <div className={styles.lessonNotFound}>Lesson not found for ID: {id}</div>;
@@ -35,6 +42,10 @@ const LessonDetail = () => {
     }
   };
 
+  const handleMarkComplete = () => {
+    setStatus('Completed');
+  };
+
   return (
     <div className={styles.lessonDetailContainer}>
       <div className={styles.lessonHeader}>
@@ -47,7 +58,13 @@ const LessonDetail = () => {
           <h2>{lesson.title}</h2>
           <div className={styles.lessonInfo}>
             <span className={styles.duration}>{lesson.duration}</span>
-            <span className={styles.status}>{lesson.status}</span>
+            <span className={styles.status}>
+              {status === 'Completed' ? '✅ Completed' : (
+                <button className={styles.completeBtn} onClick={handleMarkComplete}>
+                  Mark as Complete
+                </button>
+              )}
+            </span>
           </div>
         </div>
 
