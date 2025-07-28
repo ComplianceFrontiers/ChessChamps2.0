@@ -22,6 +22,9 @@ export default function ChessApp() {
   const [userSide, setUserSide] = useState('w'); // Track which side user is playing
   const [hintUsed, setHintUsed] = useState(false);
   const [userMoveCount, setUserMoveCount] = useState(0); // Track user moves in current puzzle
+  const [showVisualHint, setShowVisualHint] = useState(false); // Visual hint on board
+  const [pendingMove, setPendingMove] = useState(null); // Store pending non-best move
+  const [showMoveConfirmation, setShowMoveConfirmation] = useState(false); // Show confirmation dialog
 
   // Force re-render when gamePosition changes
   useEffect(() => {
@@ -109,7 +112,7 @@ export default function ChessApp() {
         throw new Error(`Invalid FEN: ${validation.error}`);
       }
       
-      console.log('🧠 CHESS API - Analyzing:', fen);
+      console.log('🧠 ENGINE - Analyzing:', fen);
       
       // ALWAYS call Chess API - no exceptions
       const response = await fetch('https://chess-api.com/v1', {
@@ -127,10 +130,10 @@ export default function ChessApp() {
       }
       
       const apiData = await response.json();
-      console.log('✅ Chess API response:', apiData);
+      console.log('✅ Engine response:', apiData);
       
       if (!apiData.move) {
-        throw new Error('No move returned from API');
+        throw new Error('No move returned from engine');
       }
       
       // Validate the move from API
@@ -149,7 +152,7 @@ export default function ChessApp() {
       return analysis;
       
     } catch (error) {
-      console.error('❌ Chess API analysis failed:', error);
+      console.error('❌ Engine analysis failed:', error);
       throw error;
     }
   };
@@ -165,7 +168,7 @@ export default function ChessApp() {
     const moveHistory = gameAfterMove.history({ verbose: true });
     const move = moveHistory[moveHistory.length - 1];
     
-    // 🏆 CHECKMATE DETECTION
+        // 🏆 CHECKMATE DETECTION
     if (gameAfterMove.isCheckmate()) {
       return {
         move: moveString,
@@ -174,14 +177,14 @@ export default function ChessApp() {
     }
     
     // 🎯 FORCED MATE IN 2 DETECTION
-    // if (gameAfterMove.inCheck()) {
-    //   const isMateIn2 = testForcedMateIn2(gameAfterMove);
-    //   if (isMateIn2) {
-    //     tacticalReasons.push("FORCED MATE IN 2");
-    //   } else {
-    //     tacticalReasons.push("CHECK");
-    //   }
-    // }
+    if (gameAfterMove.inCheck()) {
+      const isMateIn2 = testForcedMateIn2(gameAfterMove);
+      if (isMateIn2) {
+        tacticalReasons.push("FORCED MATE IN 2");
+      } else {
+        tacticalReasons.push("CHECK");
+      }
+    }
     
     // 💎 MATERIAL ANALYSIS
     if (move && move.captured) {
@@ -238,6 +241,58 @@ export default function ChessApp() {
       move: moveString,
       analysis: analysis
     };
+  };
+
+  // ACCURATE MATE IN 2 TESTER (STEP-BY-STEP VERIFICATION)
+  const testForcedMateIn2 = (gameAfterMove) => {
+    console.log('🔍 Testing for forced mate in 2...');
+    
+    // The position should be in check after our move
+    if (!gameAfterMove.inCheck()) {
+      console.log('❌ Not in check, cannot be mate in 2');
+      return false;
+    }
+    
+    const defenses = gameAfterMove.moves({ verbose: true });
+    console.log(`🛡️ Defender has ${defenses.length} legal moves`);
+    
+    if (defenses.length === 0) {
+      console.log('❌ Already checkmate, not mate in 2');
+      return false;
+    }
+    
+    // Check EVERY defensive move
+    for (let i = 0; i < defenses.length; i++) {
+      const defense = defenses[i];
+      console.log(`🔍 Testing defense ${i + 1}/${defenses.length}: ${defense.san}`);
+      
+      gameAfterMove.move(defense);
+      
+      // After this defense, can we force checkmate?
+      const attackerMoves = gameAfterMove.moves({ verbose: true });
+      let canCheckmate = false;
+      
+      for (const attackMove of attackerMoves) {
+        gameAfterMove.move(attackMove);
+        if (gameAfterMove.isCheckmate()) {
+          console.log(`✅ Found checkmate with ${attackMove.san} after ${defense.san}`);
+          canCheckmate = true;
+        }
+        gameAfterMove.undo();
+        if (canCheckmate) break;
+      }
+      
+      gameAfterMove.undo();
+      
+      // If this defense has NO checkmate follow-up, it's not forced mate
+      if (!canCheckmate) {
+        console.log(`❌ Defense ${defense.san} escapes mate - not forced mate in 2`);
+        return false;
+      }
+    }
+    
+    console.log('✅ ALL defenses lead to checkmate - TRUE FORCED MATE IN 2!');
+    return true;
   };
 
   // Function to make computer move
@@ -533,7 +588,7 @@ export default function ChessApp() {
     try {
       const bestMove = await analyzeFenPosition(firstFen);
       setAutoCorrectMove(bestMove);
-      setMessage(`Best move found: ${bestMove} (auto-analysis complete)`);
+      setMessage(`Best move found: ${bestMove} (engine analysis complete)`);
       
       // Set up the game with validated FEN
       const newGame = new Chess();
@@ -583,25 +638,98 @@ export default function ChessApp() {
     setUserSide('w');
     setHintUsed(false);
     setUserMoveCount(0); // Reset user move count
+    setPendingMove(null);
+    setShowMoveConfirmation(false);
+  };
+
+  // Function to proceed with pending move
+  const proceedWithMove = () => {
+    if (pendingMove) {
+      const { gameCopy, move } = pendingMove;
+      
+      // Execute the move
+      setGame(gameCopy);
+      setGamePosition(gameCopy.fen());
+      setCompletedPuzzles(prev => prev + 1);
+      setUserMoveCount(prev => prev + 1);
+      
+      // Clear confirmation dialog
+      setShowMoveConfirmation(false);
+      setPendingMove(null);
+      
+      // Check if game is over after user's move
+      if (gameCopy.isGameOver()) {
+        let gameResult = "";
+        if (gameCopy.isCheckmate()) {
+          gameResult = gameCopy.turn() !== userSide ? "🎉 You won by checkmate!" : "💀 You lost by checkmate!";
+        } else if (gameCopy.isDraw()) {
+          gameResult = "🤝 Game ended in a draw!";
+        } else if (gameCopy.isStalemate()) {
+          gameResult = "🤝 Game ended in stalemate!";
+        }
+        
+        setMessage(gameResult + " Loading next puzzle...");
+        setTimeout(() => {
+          loadNextPuzzle();
+        }, 2000);
+        return;
+      }
+      
+      // Check if it's computer's turn
+      if (gameCopy.turn() !== userSide) {
+        setMessage(`✅ Move played: ${move.san}! Computer's turn...`);
+        setIsComputerTurn(true);
+      } else {
+        setMessage(`✅ Move played: ${move.san}! Your turn continues.`);
+        setTimeout(async () => {
+          try {
+            const nextBestMove = await analyzeFenPosition(gameCopy.fen());
+            setAutoCorrectMove(nextBestMove);
+            setHintUsed(false);
+          } catch (error) {
+            console.error('Error analyzing next position:', error);
+          }
+        }, 500);
+      }
+    }
+  };
+
+  // Function to cancel pending move
+  const cancelMove = () => {
+    setShowMoveConfirmation(false);
+    setPendingMove(null);
+    setMessage("Move cancelled. Try again.");
   };
 
   const showHint = () => {
     if (autoCorrectMove && !hintUsed) {
-      // Check if autoCorrectMove is an object with analysis or just a string
-      if (typeof autoCorrectMove === 'object' && autoCorrectMove.analysis) {
-        setMessage(`💡 PROFESSIONAL HINT: ${autoCorrectMove.analysis}`);
-      } else if (typeof autoCorrectMove === 'string') {
-        setMessage(`💡 HINT: ${autoCorrectMove} - Best move found by API analysis`);
-      } else {
-        setMessage(`💡 Hint: Try ${autoCorrectMove}`);
-      }
+      // Show visual hint on board instead of text
+      setShowVisualHint(true);
       setHintUsed(true);
-    } else if (hintUsed) {
-      if (typeof autoCorrectMove === 'object' && autoCorrectMove.analysis) {
-        setMessage(`💡 Hint already shown: ${autoCorrectMove.analysis}`);
+      
+      // Also show a brief text message
+      let moveToShow;
+      if (typeof autoCorrectMove === 'object' && autoCorrectMove.move) {
+        moveToShow = autoCorrectMove.move;
+      } else if (typeof autoCorrectMove === 'string') {
+        moveToShow = autoCorrectMove;
       } else {
-        setMessage(`💡 Hint already shown: ${autoCorrectMove}`);
+        moveToShow = autoCorrectMove;
       }
+      
+      setMessage(`💡 VISUAL HINT: Best move highlighted on board (${moveToShow})`);
+      
+      // Hide visual hint after 5 seconds
+      setTimeout(() => {
+        setShowVisualHint(false);
+      }, 5000);
+    } else if (hintUsed) {
+      // Show hint again if already used
+      setShowVisualHint(true);
+      setTimeout(() => {
+        setShowVisualHint(false);
+      }, 5000);
+      setMessage(`💡 Hint shown again on board`);
     } else {
       setMessage("❌ No hint available for this position.");
     }
@@ -665,7 +793,7 @@ export default function ChessApp() {
 
       // Only allow the best move for the first user move (use userMoveCount instead of game history)
       if (userMoveCount === 0) {
-        console.log('=== FIRST MOVE VALIDATION ===');
+        console.log('=== FIRST MOVE VALIDATION (STRICT) ===');
         console.log('User move count:', userMoveCount);
         console.log('Game history length:', game.history().length);
         console.log('User move SAN:', move.san);
@@ -678,7 +806,6 @@ export default function ChessApp() {
           return false;
         }
         
-        
         // Extract move from analysis object if needed
         let expectedMove;
         if (typeof autoCorrectMove === 'object' && autoCorrectMove.move) {
@@ -688,21 +815,66 @@ export default function ChessApp() {
         } else {
           expectedMove = autoCorrectMove;
         }
+        
+        // Compare moves - try multiple formats for robust matching
         const userMoveSan = move.san.replace(/\s+/g, '').toLowerCase();
         const bestMoveSan = expectedMove.replace(/\s+/g, '').toLowerCase();
-        const userFromTo = `${sourceSquare}${targetSquare}`.toLowerCase();
-        const expectedFromTo = expectedMove.length===4 ? expectedMove.toLowerCase():'';
-        console.log('Normalized user move:', userMoveSan);
-        console.log('expected best move:', bestMoveSan);
-        const moveMatch = (userMoveSan === bestMoveSan) || (expectedFromTo && userFromTo === expectedFromTo);
         
-        if (!moveMatch) {
+        // Also compare the actual from-to squares directly (coordinate notation)
+        const userFromTo = `${sourceSquare}${targetSquare}`.toLowerCase();
+        const expectedFromTo = expectedMove.length >= 4 ? expectedMove.toLowerCase() : '';
+        
+        console.log('=== MOVE COMPARISON ===');
+        console.log('User move SAN (normalized):', userMoveSan);
+        console.log('Expected move SAN (normalized):', bestMoveSan);
+        console.log('User from-to coordinates:', userFromTo);
+        console.log('Expected from-to coordinates:', expectedFromTo);
+        console.log('SAN match:', userMoveSan === bestMoveSan);
+        console.log('Coordinate match:', userFromTo === expectedFromTo);
+        
+        // Check if moves match (either SAN notation or coordinate notation)
+        const movesMatch = (userMoveSan === bestMoveSan) || (expectedFromTo && userFromTo === expectedFromTo);
+        
+        if (!movesMatch) {
           console.log('❌ MOVE REJECTED - Does not match best move');
-          setMessage(`❌ Wrong move! You must play the best move found by chess API: "${expectedMove}". You tried: "${move.san}". This is the only valid first move!`);
+          setMessage(`❌ WRONG MOVE! You must play the BEST move found by the engine: "${expectedMove}" (${userFromTo} ≠ ${expectedFromTo}). You tried: "${move.san}". This is the only valid first move!`);
           return false;
         }
-        console.log('Move ACCEPTED - Mtaches best move')
-        console.log('MOVE ACCEPTED - Matches best move');
+        console.log('✅ MOVE ACCEPTED - Matches best move');
+      } else {
+        // For subsequent moves (after first move), check if it's the best move
+        console.log('=== SUBSEQUENT MOVE VALIDATION (FLEXIBLE) ===');
+        console.log('User move count:', userMoveCount);
+        console.log('User move SAN:', move.san);
+        console.log('Expected best move:', autoCorrectMove);
+        
+        if (autoCorrectMove) {
+          // Extract move from analysis object if needed
+          let expectedMove;
+          if (typeof autoCorrectMove === 'object' && autoCorrectMove.move) {
+            expectedMove = autoCorrectMove.move;
+          } else if (typeof autoCorrectMove === 'string') {
+            expectedMove = autoCorrectMove;
+          } else {
+            expectedMove = autoCorrectMove;
+          }
+          
+          // Compare moves
+          const userMoveSan = move.san.replace(/\s+/g, '').toLowerCase();
+          const bestMoveSan = expectedMove.replace(/\s+/g, '').toLowerCase();
+          const userFromTo = `${sourceSquare}${targetSquare}`.toLowerCase();
+          const expectedFromTo = expectedMove.length >= 4 ? expectedMove.toLowerCase() : '';
+          
+          const movesMatch = (userMoveSan === bestMoveSan) || (expectedFromTo && userFromTo === expectedFromTo);
+          
+          if (!movesMatch) {
+            // Store pending move and show confirmation dialog
+            setPendingMove({ gameCopy, move });
+            setShowMoveConfirmation(true);
+            setMessage(`⚠️ This is not the best move!. Do you want to proceed with your move?`);
+            return false; // Don't execute the move yet
+          }
+        }
       }
 
       // Any legal move is accepted - update the board
@@ -822,21 +994,6 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                 {isAnalyzing ? "Analyzing..." : "🚀 Start Puzzle Set"}
               </button>
               
-              {/* Debug info */}
-              <div className="mt-6 p-4 bg-gray-100 rounded-lg text-xs border border-gray-200">
-                <p className="font-bold text-gray-800 mb-2">Debug Info:</p>
-                <p className="text-gray-700">FEN Input Length: <span className="font-medium">{inputFen.length}</span></p>
-                <p className="text-gray-700">Detected FENs: <span className="font-medium">{parseFenSet(inputFen).length}</span></p>
-                <p className="text-gray-700">Is Game Setup: <span className="font-medium">{isGameSetup ? 'Yes' : 'No'}</span></p>
-                <p className="text-gray-700">Button Disabled: <span className="font-medium">{(!inputFen || isAnalyzing) ? 'Yes' : 'No'}</span></p>
-                {inputFen && parseFenSet(inputFen).length > 0 && (
-                  <p className="mt-3">
-                    <span className="font-bold text-gray-800">First FEN:</span><br />
-                    <span className="break-all text-gray-600 bg-white p-2 rounded border text-xs font-mono">{parseFenSet(inputFen)[0]}</span>
-                  </p>
-                )}
-              </div>
-              
               {/* Message display in setup phase */}
               {message && (
                 <div className={`mt-6 p-4 rounded-lg border-2 font-medium ${
@@ -888,6 +1045,8 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                         }}
                         boardKey={boardKey}
                         disabled={isComputerTurn}
+                        showVisualHint={showVisualHint}
+                        hintMove={autoCorrectMove}
                       />
                     </div>
                   </div>
@@ -933,8 +1092,8 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                   <h3 className={`font-semibold mb-3 ${isComputerTurn ? 'text-orange-900' : 'text-blue-900'}`}>Instructions:</h3>
                   <p className={`text-sm leading-relaxed ${isComputerTurn ? 'text-orange-800' : 'text-blue-800'}`}>
                     {isComputerTurn 
-                      ? "⏳ Please wait while the computer analyzes with Chess API..." 
-                      : "🎯 Click on a piece to see valid moves, then drag and drop or click to make your move. After your move, the computer will respond using Chess API analysis. Use the hint button to get the best move!"
+                      ? "⏳ Computer is thinking..." 
+                      : "🎯 Click and drag pieces to move. Use hint button for help!"
                     }
                   </p>
                 </div>
@@ -949,9 +1108,27 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                       ? 'bg-orange-50 text-orange-800 border-orange-200'
                       : message.includes('Hint') || message.includes('💡')
                       ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                      : message.includes('⚠️')
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
                       : 'bg-blue-50 text-blue-800 border-blue-200'
                   }`}>
                     <p>{message}</p>
+                    {showMoveConfirmation && (
+                      <div className="mt-4 flex gap-3">
+                        <button
+                          onClick={proceedWithMove}
+                          className="bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md"
+                        >
+                          ✅ Yes, Proceed
+                        </button>
+                        <button
+                          onClick={cancelMove}
+                          className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-md"
+                        >
+                          ❌ Cancel
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
                 
@@ -980,4 +1157,3 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
     </div>
   );
 }
-

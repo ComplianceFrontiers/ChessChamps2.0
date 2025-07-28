@@ -53,14 +53,15 @@ function getValidMoves(position, square, currentPlayer) {
     return [];
   }
 }
-export default function CustomChessboard({ position, onMove, boardKey, currentPlayer = 'w' }) 
-{
+export default function CustomChessboard({ position, onMove, boardKey, currentPlayer = 'w', showVisualHint = false, hintMove = null }) {
   const [board, setBoard] = useState([]);
   const [draggedPiece, setDraggedPiece] = useState(null);
   const [draggedFrom, setDraggedFrom] = useState(null);
   const [dragOverSquare, setDragOverSquare] = useState(null);
   const [selectedSquare, setSelectedSquare] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
+  const [hintFromSquare, setHintFromSquare] = useState(null);
+  const [hintToSquare, setHintToSquare] = useState(null);
   useEffect(() => {
     console.log('CustomChessboard received currentPlayer:', currentPlayer);
   }, [currentPlayer]);
@@ -71,6 +72,31 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
     setSelectedSquare(null);
     setValidMoves([]);
   }, [position, boardKey]);
+
+  // Parse hint move when showVisualHint changes
+  useEffect(() => {
+    if (showVisualHint && hintMove) {
+      let moveStr;
+      if (typeof hintMove === 'object' && hintMove.move) {
+        moveStr = hintMove.move;
+      } else if (typeof hintMove === 'string') {
+        moveStr = hintMove;
+      } else {
+        moveStr = hintMove;
+      }
+      
+      // Parse coordinate notation like "f6a6"
+      if (moveStr && moveStr.length >= 4) {
+        const fromSquare = moveStr.substring(0, 2);
+        const toSquare = moveStr.substring(2, 4);
+        setHintFromSquare(fromSquare);
+        setHintToSquare(toSquare);
+      }
+    } else {
+      setHintFromSquare(null);
+      setHintToSquare(null);
+    }
+  }, [showVisualHint, hintMove]);
 
   const handleSquareClick = (row, col, piece) => {
     // Adjust coordinates if board is flipped for black
@@ -179,19 +205,26 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
     const square = String.fromCharCode(97 + actualCol) + (8 - actualRow);
     const isSelected = selectedSquare === square;
     const isValidMove = validMoves.includes(square);
+    const isHintFrom = hintFromSquare === square;
+    const isHintTo = hintToSquare === square;
     const baseColor = getSquareColor(row, col);
     
     let backgroundColor = baseColor;
     let border = 'none';
     let boxShadow = 'none';
     
-    if (isSelected) {
+    if (isHintFrom) {
+      // Hint from square - use same style as selected piece
+      backgroundColor = '#fbbf24'; // Same yellow as selected piece
+      border = '3px solid #f59e0b';
+    } else if (isHintTo) {
+      // Hint to square - use same style as valid move to empty square
+      backgroundColor = '#86efac'; // Same light green as valid moves
+      border = '2px solid #22c55e';
+    } else if (isSelected) {
       backgroundColor = '#fbbf24'; // Yellow for selected piece
       border = '3px solid #f59e0b';
     } else if (isValidMove) {
-
-
-
       if (piece) {
         // Enemy piece that can be captured
         border = '3px solid #ef4444';
@@ -220,7 +253,7 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
       textShadow: getTextShadow(piece),
       border,
       boxShadow,
-      transition: 'all 0.2s ease',
+      transition: 'all 0.3s ease',
       position: 'relative'
     };
   };
@@ -235,14 +268,22 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
    [8, 7, 6, 5, 4, 3, 2, 1];
 
   return (
-    <div style={{ 
-      display: 'inline-block', 
-      border: '3px solid #8b4513',
-      borderRadius: '8px',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-      padding: '8px',
-      backgroundColor: '#8b4513'
-    }}>
+    <>
+      <style jsx>{`
+        @keyframes pulse {
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
+      <div style={{ 
+        display: 'inline-block', 
+        border: '3px solid #8b4513',
+        borderRadius: '8px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+        padding: '8px',
+        backgroundColor: '#8b4513'
+      }}>
       {/* Coordinate labels - letters */}
       <div style={{ 
         display: 'grid', 
@@ -304,6 +345,10 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
               const actualCol = currentPlayer === 'b' ? 7 - colIndex : colIndex;
               const actualSquare = String.fromCharCode(97 + actualCol) + (8 - actualRow);
               
+              // Check if this square is part of the hint
+              const isHintFrom = hintFromSquare === actualSquare;
+              const isHintTo = hintToSquare === actualSquare;
+              
               return (
                 <div
                   key={squareKey}
@@ -320,6 +365,17 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
                   {pieces[piece] || ''}
                   {/* Add a dot indicator for valid moves on empty squares */}
                   {!piece && validMoves.includes(actualSquare) && (
+                    <div style={{
+                      position: 'absolute',
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      backgroundColor: '#22c55e',
+                      opacity: 0.8
+                    }} />
+                  )}
+                  {/* Add hint dot indicator only for the target square */}
+                  {!piece && isHintTo && (
                     <div style={{
                       position: 'absolute',
                       width: '12px',
@@ -390,5 +446,6 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
         Position: {position} {currentPlayer === 'b' ? '(Black\'s perspective)' : '(White\'s perspective)'}
       </div>
     </div>
+    </>
   );
 }
