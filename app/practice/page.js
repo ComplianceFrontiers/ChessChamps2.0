@@ -837,7 +837,7 @@ export default function ChessApp() {
         
         if (!movesMatch) {
           console.log('❌ MOVE REJECTED - Does not match best move');
-          setMessage(`❌ WRONG MOVE! You must play the BEST move found by the engine: "${expectedMove}" (${userFromTo} ≠ ${expectedFromTo}). You tried: "${move.san}". This is the only valid first move!`);
+          setMessage(`❌ WRONG MOVE! You must play the BEST move`);
           return false;
         }
         console.log('✅ MOVE ACCEPTED - Matches best move');
