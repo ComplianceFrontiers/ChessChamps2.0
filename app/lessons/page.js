@@ -4,13 +4,11 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './Lessons.module.scss';
-
 export default function Lessons() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('available');
   const currentLevel = 'Pawn'; // You can make this dynamic later
 
-  // Map level names to numeric prefixes
   const levelToIdMap = {
     Pawn: 1,
     Knight: 2,
@@ -20,140 +18,132 @@ export default function Lessons() {
     King: 6,
   };
 
+  const universalLessons = [
+    {
+      id: 1,
+      title: "Opening Principles",
+      description: "Smart moves to start the game.",
+    },
+    {
+      id: 2,
+      title: "Development of Pieces",
+      description: "Bring your team into action early.",
+    },
+    {
+      id: 3,
+      title: "Route Planner",
+      description: "Plan your piece’s journey carefully.",
+    },
+    {
+      id: 4,
+      title: "The Pin",
+      description: "Freeze a piece that can't move.",
+    },
+    {
+      id: 5,
+      title: "Skewer",
+      description: "Stronger piece escapes, weaker one falls.",
+    },
+    {
+      id: 6,
+      title: "Double Attack",
+      description: "One move, two threats at once.",
+    },
+    {
+      id: 7,
+      title: "Deflection",
+      description: "Pull a defender away from duty.",
+    },
+    {
+      id: 8,
+      title: "Defensive Move",
+      description: "Protect your pieces with smart play.",
+    },
+    {
+      id: 9,
+      title: "Draws",
+      description: "When no one wins the game.",
+    },
+    {
+      id: 10,
+      title: "Stalemate",
+      description: "King is stuck but not in danger.",
+    },
+    {
+      id: 11,
+      title: "Back Rank Mate",
+      description: "Trapped king gets checkmated on back rank.",
+    },
+    {
+      id: 12,
+      title: "Smothered Mate",
+      description: "King trapped by its own team.",
+    },
+    {
+      id: 13,
+      title: "Anastasia’s Mate",
+      description: "Knight and rook trap the king beautifully.",
+    },
+    {
+      id: 14,
+      title: "Mate in One",
+      description: "Win the game in one move!",
+    },
+    {
+      id: 15,
+      title: "Mate in Two",
+      description: "Plan two perfect moves to win.",
+    },
+    {
+      id: 16,
+      title: "Mating with the Rook",
+      description: "Use your rook to checkmate simply.",
+    },
+    {
+      id: 17,
+      title: "Mating with the Queen",
+      description: "The queen finishes the game proudly.",
+    },
+    {
+      id: 18,
+      title: "The Passed Pawn",
+      description: "A pawn with a clear path forward.",
+    },
+    {
+      id: 19,
+      title: "Promotion",
+      description: "Pawn transforms into a powerful piece.",
+    },
+    {
+      id: 20,
+      title: "Winning Material",
+      description: "Gain more valuable pieces than your opponent.",
+    },
+  ];
+  
+  
+  
+  
+
   const levelLessons = {
-    Pawn: [
-      "The Board and the Pieces",
-      "How the Pieces Move",
-      "Attack and Capture",
-      "The Pawn",
-      "Defending Check",
-      "Mate in One",
-      "Mate in Two",
-      "Castling",
-      "The Profitable Exchange",
-      "The Two-Fold Attack",
-      "Draws",
-      "Mating with the Queen",
-      "Capturing En Passant",
-      "Winning Material",
-      "Defending",
-      "Defending Against Mate",
-      "The Passed Pawn",
-    ],
-    Knight: [
-      "Double Attack",
-      "The Pin",
-      "Eliminating the Defense",
-      "The Three Golden Rules",
-      "Mate in Two",
-      "Mating with the Rook",
-      "Discovered Attack",
-      "Defending Against Mate",
-      "The Intermediate Move",
-      "Pawn Endings",
-      "The Opening",
-      "Route Planner",
-      "Stalemate",
-      "Winning Material",
-    ],
-    Bishop: [
-      "The Opening",
-      "Discovered and Double Check",
-      "Attacking a Pinned Piece",
-      "Meet After Gaining Access",
-      "The Square of the Pawn",
-      "Eliminating the Defense",
-      "Defending Against a Double Attack",
-      "Mini Plans",
-      "Draws",
-      "X-ray",
-      "Defending Against a Pin",
-      "Mobility",
-      "Key Squares",
-      "The Rook Pawn",
-      "The Intermediate Move",
-      "Vulnerability in the Opening",
-      "Underpromotion",
-      "Development",
-      "Pinning",
-      "Defending Against Mate",
-      "The Discovered Attack",
-    ],
-    Rook: [
-      "Opening Advantage",
-      "Interfering",
-      "Luring",
-      "Blocking",
-      "Thinking Ahead",
-      "The Pin: Luring",
-      "The Passed Pawn",
-      "Eliminating the Defense",
-      "The Magnet",
-      "Weak Pawns",
-      "Material Advantage",
-      "Chasing and Targeting",
-      "Attacking the King",
-      "7th Rank",
-      "Endgame Strategy",
-      "Clearing",
-      "Queen Against Pawn",
-      "Draws",
-      "Trapping",
-    ],
-    Queen: [
-      "Material and Time",
-      "Mate",
-      "Breakthrough",
-      "How to Use Pawns",
-      "Pawn Race",
-      "The 7th Rank",
-      "Discovered Attack",
-      "The Pin",
-      "The Opening",
-      "Rook Against Pawn",
-      "Strong Square",
-      "Defending",
-      "Rook Ending",
-      "Attacking the King",
-      "Open File",
-      "Draws",
-      "Activity",
-      "King in the Middle",
-      "The Wrong Bishop",
-      "Vulnerability",
-      "Queen Endings",
-      "Eternal Pins",
-      "Bishop Against Pawns",
-      "Zugzwang",
-    ],
-    King: [
-      "King in the Middle",
-      "The Passed Pawn",
-      "Strategy",
-      "Mobility",
-      "Draws",
-      "The Opening",
-      "Tactics",
-      "Pawn Endings",
-      "Bishop or Knight",
-      "Attacking the King",
-      "Endgame Advantage",
-      "Bishops",
-      "Defending",
-      "Rook Endings",
-    ],
+    Pawn: universalLessons,
+    Knight: universalLessons,
+    Bishop: universalLessons,
+    Rook: universalLessons,
+    Queen: universalLessons,
+    King: universalLessons,
   };
 
-  // Generate lesson data with dynamic IDs like "1.1", "1.2"
   const levelId = levelToIdMap[currentLevel];
-  const lessonsData = levelLessons[currentLevel].map((title, index) => ({
-    id: `${levelId}.${index + 1}`,
-    title: `Lesson ${index + 1}: ${title}`,
-    length: `${5 + (index % 5)}:${Math.floor(Math.random() * 60)
-      .toString()
-      .padStart(2, '0')}`,
-    img: `/lessonimages/lesson2.png`,
-  }));
+  const lessonsData = levelLessons[currentLevel].map((lesson, index) => {
+    return {
+      id: `${levelId}.${index + 1}`,
+      title: `Lesson ${index + 1}: ${lesson.title}`,
+      desc: lesson.description,
+      img: `/lessonimages/${index + 1}.png`, // <-- changed here
+    };
+  });
+
 
   const handleStartLesson = (lessonId) => {
     router.push(`/lessondetails/${lessonId}`);
@@ -185,19 +175,11 @@ export default function Lessons() {
       <div className={styles.grid}>
         {lessonsData.map((lesson) => (
           <div className={styles.card} key={lesson.id}>
-            <Image
-              src={lesson.img}
-              alt={lesson.title}
-              width={300}
-              height={160}
-              className={styles.image}
-            />
+            <Image src={lesson.img} alt={lesson.title} width={400} height={200} />
+
             <div className={styles.cardContent}>
-              <p className={styles.length}>Length {lesson.length}</p>
               <h3 className={styles.title}>{lesson.title}</h3>
-              <p className={styles.desc}>
-                Learn and improve your chess skills with this lesson.
-              </p>
+              <p className={styles.desc}>{lesson.desc}</p>
               <button
                 className={styles.startBtn}
                 onClick={() => handleStartLesson(lesson.id)}

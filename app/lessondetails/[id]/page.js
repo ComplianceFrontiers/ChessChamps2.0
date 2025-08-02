@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from './LessonDetails.module.scss';
-import lessonContent from './lessonData';
+  import {lessonContent, universalLessons} from './lessonData';
 
 const LessonDetail = () => {
   const router = useRouter();
