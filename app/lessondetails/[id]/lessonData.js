@@ -2,7 +2,7 @@
 
 export const lessonContent = {
   "1.1": {
-    level: "Category",
+    level: "Pawn",
     title: "Opening Principles",
     duration: "5:23",
     status: "Completed",

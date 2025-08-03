@@ -54,7 +54,7 @@ const LessonDetail = () => {
 
       <div className={styles.lessonBody}>
         <div className={styles.lessonMeta}>
-          <h5>Category</h5>
+          <h5>{lesson.level}</h5>
           <h2>{lesson.title}</h2>
           <div className={styles.lessonInfo}>
             <span className={styles.duration}>{lesson.duration}</span>
