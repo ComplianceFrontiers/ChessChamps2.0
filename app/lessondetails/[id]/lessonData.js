@@ -2,7 +2,7 @@
 
 export const lessonContent = {
   "1.1": {
-    level: "Pawn",
+    level: "Category",
     title: "Opening Principles",
     duration: "5:23",
     status: "Completed",
@@ -10,8 +10,7 @@ export const lessonContent = {
       "Start the game strong by controlling the center, developing your pieces quickly, and keeping your king safe.",
     image: "/lessonimages/1.png",
     resources: [
-      { name: "Chess Board Basics PDF", link: "#" },
-      { name: "Printable Piece Guide", link: "#" },
+      { name: "Printable Practice Positions", link: "#" },
     ],
   },
   "1.2": {
@@ -22,7 +21,9 @@ export const lessonContent = {
     description:
       "Bring your knights and bishops into action early to build a powerful position.",
     image: "/lessonimages/2.png",
-    resources: [{ name: "Movement Rules Chart", link: "#" }],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.3": {
     level: "Pawn",
@@ -32,7 +33,9 @@ export const lessonContent = {
     description:
       "Plan creative paths for your pieces to reach strong, active squares on the board.",
     image: "/lessonimages/3.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.4": {
     level: "Pawn",
@@ -42,7 +45,9 @@ export const lessonContent = {
     description:
       "Freeze your opponent’s piece by pinning it so it can’t move without losing something important.",
     image: "/lessonimages/4.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.5": {
     level: "Pawn",
@@ -52,7 +57,9 @@ export const lessonContent = {
     description:
       "Attack a big piece that hides a smaller one behind it—when it moves, you capture the piece behind.",
     image: "/lessonimages/5.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.6": {
     level: "Pawn",
@@ -62,7 +69,9 @@ export const lessonContent = {
     description:
       "Use one clever move to threaten two targets at once, forcing your opponent to choose only one to save.",
     image: "/lessonimages/6.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.7": {
     level: "Pawn",
@@ -72,7 +81,9 @@ export const lessonContent = {
     description:
       "Lure a guarding piece away from its post so you can strike at the now unprotected target.",
     image: "/lessonimages/7.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.8": {
     level: "Pawn",
@@ -82,7 +93,9 @@ export const lessonContent = {
     description:
       "Sometimes the smartest move is to protect your own pieces and prevent your opponent’s plans.",
     image: "/lessonimages/8.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.9": {
     level: "Pawn",
@@ -92,7 +105,9 @@ export const lessonContent = {
     description:
       "When both players play well and no one wins, the game ends in a fair and peaceful draw.",
     image: "/lessonimages/9.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.10": {
     level: "Pawn",
@@ -102,7 +117,9 @@ export const lessonContent = {
     description:
       "If your opponent has no legal moves but isn't in check, the game ends in a surprise draw called stalemate.",
     image: "/lessonimages/10.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.11": {
     level: "Pawn",
@@ -112,7 +129,9 @@ export const lessonContent = {
     description:
       "Trap the enemy king behind its own pawns and deliver checkmate with a rook or queen.",
     image: "/lessonimages/11.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.12": {
     level: "Pawn",
@@ -122,7 +141,9 @@ export const lessonContent = {
     description:
       "Use your knight to checkmate a king that is trapped by its own pieces.",
     image: "/lessonimages/12.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.13": {
     level: "Pawn",
@@ -132,7 +153,9 @@ export const lessonContent = {
     description:
       "A knight blocks escape squares while a rook delivers a beautiful checkmate along the edge of the board.",
     image: "/lessonimages/13.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.14": {
     level: "Pawn",
@@ -142,7 +165,9 @@ export const lessonContent = {
     description:
       "Spot the single winning move that ends the game with an instant checkmate.",
     image: "/lessonimages/14.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.15": {
     level: "Pawn",
@@ -152,7 +177,9 @@ export const lessonContent = {
     description:
       "Think two moves ahead to create and deliver a perfect checkmate plan.",
     image: "/lessonimages/15.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.16": {
     level: "Pawn",
@@ -162,7 +189,9 @@ export const lessonContent = {
     description:
       "Use your rook with the help of your king to corner and checkmate the enemy king.",
     image: "/lessonimages/16.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.17": {
     level: "Pawn",
@@ -172,7 +201,9 @@ export const lessonContent = {
     description:
       "The queen’s power can end the game by carefully trapping the enemy king.",
     image: "/lessonimages/17.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.18": {
     level: "Pawn",
@@ -182,7 +213,9 @@ export const lessonContent = {
     description:
       "A pawn with no enemies blocking its way is powerful and ready to march to promotion.",
     image: "/lessonimages/18.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.19": {
     level: "Pawn",
@@ -192,7 +225,9 @@ export const lessonContent = {
     description:
       "When your pawn reaches the last rank, it transforms—usually into a mighty queen!",
     image: "/lessonimages/19.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
   "1.20": {
     level: "Pawn",
@@ -202,7 +237,9 @@ export const lessonContent = {
     description:
       "Capture your opponent’s valuable pieces to gain an advantage and make winning easier.",
     image: "/lessonimages/20.png",
-    resources: [],
+    resources: [
+      { name: "Printable Practice Positions", link: "#" },
+    ],
   },
 };
 

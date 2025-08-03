@@ -1,11 +1,17 @@
 .lessonDetailContainer {
-    background-color: #000;
-    color: #fff;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  background: linear-gradient(to bottom, #f15a24 45%, #000 50%);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 5px;
+  @media (max-width: 768px) {
+    background: linear-gradient(to bottom, #f15a24 15%, #000 20%);
+    padding: 1px;
   }
+}
+
   
   .lessonHeader {
     width: 100%;
@@ -17,6 +23,11 @@
       height: auto;
       display: block;
       object-fit: cover;
+      padding: 2rem;
+      @media (max-width: 768px) {
+        padding: 1rem;
+        margin-top: 30px;
+      }
     }
   }
   
