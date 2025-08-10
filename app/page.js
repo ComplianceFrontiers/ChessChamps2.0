@@ -18,7 +18,7 @@ export default function Home1() {
   const modules = [
     { name: "Training", path: "/training", icon: <School size={82} /> },
     { name: "Lessons", path: "/lessons", icon: <BookOpenCheck size={82} /> },
-    { name: "Practice", path: "/practice", icon: <Puzzle size={82} /> },
+    { name: "Practice", path: "/practicehome", icon: <Puzzle size={82} /> },
     { name: "Online Learning", path: "/online-learning", icon: <Monitor size={82} /> },
     { name: "Tournaments", path: "/tournaments", icon: <Trophy size={82} /> },
     { name: "Performance", path: "/performance", icon: <PieChart size={82} /> },

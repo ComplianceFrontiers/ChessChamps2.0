@@ -24,7 +24,7 @@ const modules = [
 
   { name: "Training", path: "/training", icon: <School size={24} /> },
   { name: "Lessons", path: "/lessons", icon: <BookOpenCheck size={24} /> },
-  { name: "Practice", path: "/practice", icon: <Puzzle size={24} /> },
+  { name: "Practice", path: "/practicehome", icon: <Puzzle size={24} /> },
   { name: "Online", path: "/online-learning", icon: <Monitor size={24} /> },
   { name: "Tournaments", path: "/tournaments", icon: <Trophy size={24} /> },
   { name: "Performance", path: "/performance", icon: <PieChart size={24} /> },
