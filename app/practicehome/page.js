@@ -1,6 +1,14 @@
 import React from "react";
 import styles from "./PracticeHome.module.scss";
 
+const categoryStyles = {
+  "Opening Fundamentals": styles.openingFundamentals,
+  "Core Tactics": styles.coreTactics,
+  "Defensive Concepts": styles.defensiveConcepts,
+  "Endgame Basics": styles.endgameBasics,
+  "Middlegame Strategy": styles.middlegameStrategy,
+};
+
 const lessons = [
   {
     category: "Opening Fundamentals",
@@ -58,7 +66,12 @@ const PracticeHome = () => {
           {lessons.map((section, index) => (
             <React.Fragment key={index}>
               <tr>
-                <td colSpan={5} className={styles.category}>{section.category}</td>
+                <td
+                  colSpan={5}
+                  className={`${styles.category} ${categoryStyles[section.category] || ""}`}
+                >
+                  {section.category}
+                </td>
               </tr>
               {section.items.map((lesson, idx) => (
                 <tr key={idx}>

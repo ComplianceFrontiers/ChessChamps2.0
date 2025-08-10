@@ -12,10 +12,6 @@
   font-weight: bold;
   padding: 0.5rem 1rem;
   margin-bottom: 1.5rem;
-  display: inline-block;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .lessonTable {
@@ -28,12 +24,40 @@
 .lessonTable td {
   border: 1px solid #ccc;
   padding: 0.5rem;
-  color: black; // ensures lesson text is black
+  color: black;
 }
 
+/* Common category style */
 .category {
   font-weight: bold;
-  background-color: #f9f9f9;
+  font-size: 1.1rem;
+  padding: 0.75rem;
+}
+
+/* Category-specific styles */
+.openingFundamentals {
+  background-color: #ffefd5; /* peach */
+  color: #333;
+}
+
+.coreTactics {
+  background-color: #e6f7ff; /* light blue */
+  color: #003366;
+}
+
+.defensiveConcepts {
+  background-color: #f0fff0; /* light green */
+  color: #2e8b57;
+}
+
+.endgameBasics {
+  background-color: #fff0f5; /* light pink */
+  color: #800080;
+}
+
+.middlegameStrategy {
+  background-color: #f5f5dc; /* beige */
+  color: #5b4636;
 }
 
 .lessonNumber {
@@ -63,4 +87,52 @@
   border: none;
   cursor: pointer;
   min-width: 100px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .lessonTable,
+  .lessonTable tbody,
+  .lessonTable tr,
+  .lessonTable td {
+    display: block;
+    width: 100%;
+  }
+
+  .lessonTable tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .lessonTable td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 0.75rem;
+  }
+
+  .lessonTable td:last-child {
+    border-bottom: none;
+  }
+
+  .lessonNumber {
+    background: #f4f4f4;
+    font-weight: bold;
+  }
+
+  .lessonTitle {
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.75rem 0;
+  }
+
+  .btn,
+  .completeBtn {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
 }

@@ -94,7 +94,7 @@ const LessonDetail = () => {
 
           <button
             className={styles.practiceBtn}
-            onClick={() => router.push(`/practicepuzzle/${id}`)}
+            onClick={() => router.push(`/practicehome`)}
           >
             Practice
           </button>
