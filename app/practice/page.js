@@ -28,15 +28,15 @@ export default function ChessApp() {
   const [showVisualHint, setShowVisualHint] = useState(false); // Visual hint on board
   const [pendingMove, setPendingMove] = useState(null); // Store pending non-best move
   const [showMoveConfirmation, setShowMoveConfirmation] = useState(false); // Show confirmation dialog
-  useEffect(() => {
-    const fensParam = searchParams.get('fens');
-    if (fensParam) {
-      const decoded = decodeURIComponent(fensParam);
-      const fensArray = decoded.split(',').map(f => f.trim()).filter(Boolean);
-      const inputString = fensArray.join('\n'); // mimic textarea input
-      setupGameWithFen(inputString); // call your existing function
-    }
-  }, []);
+  // useEffect(() => {
+  //   const fensParam = searchParams.get('fens');
+  //   if (fensParam) {
+  //     const decoded = decodeURIComponent(fensParam);
+  //     const fensArray = decoded.split(',').map(f => f.trim()).filter(Boolean);
+  //     const inputString = fensArray.join('\n'); // mimic textarea input
+  //     setupGameWithFen(inputString); // call your existing function
+  //   }
+  // }, []);    must be reverted
   // Force re-render when gamePosition changes
   useEffect(() => {
     console.log("useEffect triggered - gamePosition changed:", gamePosition);

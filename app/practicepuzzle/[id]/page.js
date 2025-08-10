@@ -24,7 +24,7 @@ const PracticePage = () => {
     const fenString = lesson.practice?.join(',') ?? '';
     // Encode URI component to avoid breaking with `/`, spaces etc.
     const encodedFens = encodeURIComponent(fenString);
-    // router.push(`/practice/${encodedFens}`);
+    // router.push(`/practice/${encodedFens}`); must be reverted
   };
   
   return (
