@@ -1,0 +1,35 @@
+.practiceContainer {
+  background-color: #f0f8ff;
+  color: #333;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Comic Sans MS', 'Poppins', cursive;
+
+  h2 {
+    font-size: 2.5rem;
+    color: #0077cc;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .startBtn {
+    background-color: #ffcc00;
+    color: #000;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: #ffaa00;
+    }
+  }
+}

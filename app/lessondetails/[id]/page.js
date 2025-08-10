@@ -54,7 +54,7 @@ const LessonDetail = () => {
 
       <div className={styles.lessonBody}>
         <div className={styles.lessonMeta}>
-          <h5>{lesson.level}</h5>
+          <h5>{lesson.category}</h5>
           <h2>{lesson.title}</h2>
           <div className={styles.lessonInfo}>
             <span className={styles.duration}>{lesson.duration}</span>
@@ -92,7 +92,12 @@ const LessonDetail = () => {
             Previous Lesson
           </button>
 
-          <button className={styles.practiceBtn}>Practice</button>
+          <button
+            className={styles.practiceBtn}
+            onClick={() => router.push(`/practicepuzzle/${id}`)}
+          >
+            Practice
+          </button>
 
           <button
             className={styles.nextBtn}

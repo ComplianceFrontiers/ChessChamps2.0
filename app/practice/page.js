@@ -3,8 +3,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { Chess } from "chess.js";
 import CustomChessboard from "../components/CustomChessboard";
+import { useSearchParams } from 'next/navigation';
+
 
 export default function ChessApp() {
+  const searchParams = useSearchParams();
   const [game, setGame] = useState(new Chess());
   const [gamePosition, setGamePosition] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   const [boardPosition, setBoardPosition] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
@@ -25,7 +28,15 @@ export default function ChessApp() {
   const [showVisualHint, setShowVisualHint] = useState(false); // Visual hint on board
   const [pendingMove, setPendingMove] = useState(null); // Store pending non-best move
   const [showMoveConfirmation, setShowMoveConfirmation] = useState(false); // Show confirmation dialog
-
+  useEffect(() => {
+    const fensParam = searchParams.get('fens');
+    if (fensParam) {
+      const decoded = decodeURIComponent(fensParam);
+      const fensArray = decoded.split(',').map(f => f.trim()).filter(Boolean);
+      const inputString = fensArray.join('\n'); // mimic textarea input
+      setupGameWithFen(inputString); // call your existing function
+    }
+  }, []);
   // Force re-render when gamePosition changes
   useEffect(() => {
     console.log("useEffect triggered - gamePosition changed:", gamePosition);
@@ -77,30 +88,6 @@ export default function ChessApp() {
     console.log("Simple validation passed, accepting FEN");
     return { valid: true };
     
-    // Commented out chess.js validation temporarily
-    /*
-    // Then try chess.js validation
-    try {
-      console.log("Attempting chess.js validation...");
-      const testGame = new Chess();
-      
-      // Try to load the FEN
-      const loadResult = testGame.load(fen);
-      console.log("Chess.js load result:", loadResult);
-      
-      // In newer versions of chess.js, load() returns true on success
-      if (loadResult === false) {
-        console.log("Chess.js load returned false");
-        return { valid: false, error: 'Invalid FEN format (chess.js load failed)' };
-      }
-      
-      console.log("Chess.js validation successful");
-      return { valid: true };
-    } catch (error) {
-      console.log("Chess.js validation threw error:", error);
-      return { valid: false, error: `Chess.js validation error: ${error.message}` };
-    }
-    */
   };
 
   // CHESS API ANALYSIS ENGINE - ALWAYS USE API
@@ -964,9 +951,7 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
               
               <button
                 onClick={() => {
-                  console.log("=== BUTTON CLICK DEBUG ===");
-                  console.log("Current inputFen state:", JSON.stringify(inputFen));
-                  
+                 
                   // Get the actual textarea value directly
                   const textareaElement = document.querySelector('textarea');
                   const textareaValue = textareaElement ? textareaElement.value : '';
