@@ -3,10 +3,10 @@ import styles from "./PracticeHome.module.scss";
 
 const categoryStyles = {
   "Opening Fundamentals": styles.openingFundamentals,
-  "Core Tactics": styles.coreTactics,
-  "Defensive Concepts": styles.defensiveConcepts,
-  "Endgame Basics": styles.endgameBasics,
-  "Middlegame Strategy": styles.middlegameStrategy,
+  "Core Tactics": styles.openingFundamentals,
+  "Defensive Concepts": styles.openingFundamentals,
+  "Endgame Basics": styles.openingFundamentals,
+  "Middlegame Strategy": styles.openingFundamentals,
 };
 
 const lessons = [
@@ -75,15 +75,16 @@ const PracticeHome = () => {
               </tr>
               {section.items.map((lesson, idx) => (
                 <tr key={idx}>
-                  <td className={styles.lessonNumber}>Lesson - {lesson.number}</td>
-                  <td className={styles.lessonTitle}>{lesson.title}</td>
-                  <td>
+                  <td colSpan={2} className={styles.lessonTitle}>
+                    Lesson {lesson.number}: {lesson.title}
+                  </td>
+                  <td colSpan={3} className={styles.buttonGroup}>
                     <button className={lesson.beginner === "Complete" ? styles.completeBtn : styles.btn}>
                       {lesson.beginner}
                     </button>
+                    <button className={styles.btn}>{lesson.intermediate}</button>
+                    <button className={styles.btn}>{lesson.advanced}</button>
                   </td>
-                  <td><button className={styles.btn}>{lesson.intermediate}</button></td>
-                  <td><button className={styles.btn}>{lesson.advanced}</button></td>
                 </tr>
               ))}
             </React.Fragment>

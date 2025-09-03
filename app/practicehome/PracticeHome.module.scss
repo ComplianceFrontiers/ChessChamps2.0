@@ -2,6 +2,7 @@
   background-color: #0d2649;
   min-height: 100vh;
   padding: 2rem;
+  color: white;
 }
 
 .heading {
@@ -16,100 +17,94 @@
 
 .lessonTable {
   width: 100%;
-  background-color: white;
+  background-color: #122f57;
   border-collapse: collapse;
   font-family: Arial, sans-serif;
 }
 
 .lessonTable td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  color: black;
+  border: 1px solid #1c3b65;
+  padding: 0.75rem;
+  color: white;
 }
 
-/* Common category style */
+/* Category style */
 .category {
   font-weight: bold;
   font-size: 1.1rem;
   padding: 0.75rem;
+  color: white;
+  border-top: 1px solid #ffffff;  /* White line above */
+  border-bottom: 1px solid #ffffff; /* White line below */
 }
 
-/* Category-specific styles */
+
+/* Category-specific backgrounds */
 .openingFundamentals {
-  background-color: #ffefd5; /* peach */
-  color: #333;
-}
-
-.coreTactics {
-  background-color: #e6f7ff; /* light blue */
-  color: #003366;
-}
-
-.defensiveConcepts {
-  background-color: #f0fff0; /* light green */
-  color: #2e8b57;
-}
-
-.endgameBasics {
-  background-color: #fff0f5; /* light pink */
-  color: #800080;
-}
-
-.middlegameStrategy {
-  background-color: #f5f5dc; /* beige */
-  color: #5b4636;
-}
-
-.lessonNumber {
-  width: 120px;
-  font-weight: bold;
+  background-color: #e95f0f;
+ 
 }
 
 .lessonTitle {
-  min-width: 250px;
+  font-weight: bold;
+  color: white;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .btn {
-  background-color: #0a2b63;
+  background-color: #103b70;
   color: white;
-  padding: 0.3rem 0.8rem;
+  padding: 0.4rem 1rem;
   border-radius: 4px;
-  border: none;
+  border: 1px solid #1f4d7a;
   cursor: pointer;
   min-width: 100px;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #1c4c84;
 }
 
 .completeBtn {
   background-color: #4caf50;
   color: white;
-  padding: 0.3rem 0.8rem;
+  padding: 0.4rem 1rem;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   min-width: 100px;
 }
 
-/* Mobile */
+/* Mobile styles */
 @media (max-width: 768px) {
   .lessonTable,
   .lessonTable tbody,
   .lessonTable tr,
   .lessonTable td {
+    font-size: small;
     display: block;
     width: 100%;
   }
 
   .lessonTable tr {
     margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    background: #fff;
+    border: 1px solid #1f4d7a;
+    background: #122f57;
     border-radius: 6px;
     overflow: hidden;
   }
 
   .lessonTable td {
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #1f4d7a;
     padding: 0.75rem;
   }
 
@@ -117,22 +112,19 @@
     border-bottom: none;
   }
 
-  .lessonNumber {
-    background: #f4f4f4;
-    font-weight: bold;
-  }
-
   .lessonTitle {
-    font-weight: 500;
     font-size: 1rem;
     padding: 0.75rem 0;
   }
 
+  .buttonGroup {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
   .btn,
   .completeBtn {
-    display: inline-block;
     width: 100%;
-    text-align: center;
-    margin-top: 0.5rem;
+    margin-top: 0;
   }
 }
