@@ -26,6 +26,7 @@ export default function ChessApp() {
   const [showVisualHint, setShowVisualHint] = useState(false); // Visual hint on board
   const [pendingMove, setPendingMove] = useState(null); // Store pending non-best move
   const [showMoveConfirmation, setShowMoveConfirmation] = useState(false); // Show confirmation dialog
+  const [puzzleTitle,setPuzzleTitle] = useState(""); // Store pending non-best move
 
   // Force re-render when gamePosition changes
   useEffect(() => {
@@ -56,6 +57,12 @@ export default function ChessApp() {
           if (singleFen) {
             urlFens = [singleFen];
           }
+        }
+
+        const urlTitle=urlParams.get('title');
+        if(urlTitle){
+          const decodedTitle=decodeURIComponent(urlTitle);
+          setPuzzleTitle(decodedTitle);
         }
         
         if (urlFens && !isGameSetup) {
@@ -709,6 +716,7 @@ export default function ChessApp() {
     setUserMoveCount(0); // Reset user move count
     setPendingMove(null);
     setShowMoveConfirmation(false);
+    setPuzzleTitle("");
   };
 
   // Function to proceed with pending move
@@ -1081,7 +1089,7 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
           <div className="bg-white rounded-lg shadow-xl p-8 mb-8 border border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-2xl font-semibold text-gray-900">
-                {isComputerTurn ? "🤖 Computer's Turn" : "🎯 Your Turn"}
+                {puzzleTitle || (isComputerTurn ? "🤖 Computer's Turn" : "🎯 Your Turn")}
               </h2>
               <div className="flex gap-3">
                 <button
