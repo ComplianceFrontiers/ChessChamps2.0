@@ -1165,16 +1165,6 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
                   </div>
                 </div>
                 
-                <div className={`p-4 md:p-6 rounded-lg border ${isComputerTurn ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
-                  <h3 className={`font-semibold mb-3 ${isComputerTurn ? 'text-orange-900' : 'text-blue-900'}`}>Instructions:</h3>
-                  <p className={`text-sm leading-relaxed ${isComputerTurn ? 'text-orange-800' : 'text-blue-800'}`}>
-                    {isComputerTurn 
-                      ? "⏳ Computer is thinking..." 
-                      : "🎯 Click and drag pieces to move. Use hint button for help!"
-                    }
-                  </p>
-                </div>
-                
                 {message && (
                   <div className={`p-4 md:p-6 rounded-lg border-2 font-medium ${
                     message.includes('Good move') || message.includes('won') || message.includes('Correct')
