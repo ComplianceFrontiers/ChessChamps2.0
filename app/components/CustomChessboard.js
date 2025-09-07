@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useEffect } from 'react';
 import { Chess } from 'chess.js';
@@ -62,6 +63,66 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
   const [validMoves, setValidMoves] = useState([]);
   const [hintFromSquare, setHintFromSquare] = useState(null);
   const [hintToSquare, setHintToSquare] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Get responsive sizes based on screen size
+  const getResponsiveSizes = () => {
+    if (typeof window === 'undefined') return { squareSize: 50, fontSize: 36, coordinateWidth: 20, coordinateFontSize: 12 };
+    
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth < 380) {
+      // Extra small phones
+      return {
+        squareSize: 35,
+        fontSize: 24,
+        coordinateWidth: 15,
+        coordinateFontSize: 9,
+        padding: 4
+      };
+    } else if (screenWidth < 480) {
+      // Small phones
+      return {
+        squareSize: 40,
+        fontSize: 28,
+        coordinateWidth: 16,
+        coordinateFontSize: 10,
+        padding: 6
+      };
+    } else if (screenWidth < 768) {
+      // Large phones / small tablets
+      return {
+        squareSize: 45,
+        fontSize: 32,
+        coordinateWidth: 18,
+        coordinateFontSize: 11,
+        padding: 6
+      };
+    } else {
+      // Desktop
+      return {
+        squareSize: 50,
+        fontSize: 36,
+        coordinateWidth: 20,
+        coordinateFontSize: 12,
+        padding: 8
+      };
+    }
+  };
+
+  const sizes = getResponsiveSizes();
   useEffect(() => {
     console.log('CustomChessboard received currentPlayer:', currentPlayer);
   }, [currentPlayer]);
@@ -195,7 +256,7 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
   };
 
   const getSquareColor = (row, col) => {
-    return (row + col) % 2 === 0 ? '#f0d9b5' : '#b58863'; // Classic chess board colors
+    return (row + col) % 2 === 0 ? '#e1eaf0' : '#6b8eac'; // New color scheme: light and dark blue squares
   };
 
   const getSquareStyle = (row, col, piece, isDragOver) => {
@@ -239,13 +300,13 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
     }
     
     return {
-      width: '50px',
-      height: '50px',
+      width: `${sizes.squareSize}px`,
+      height: `${sizes.squareSize}px`,
       backgroundColor,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '36px',
+      fontSize: `${sizes.fontSize}px`,
       fontWeight: 'bold',
       cursor: piece || isValidMove ? 'pointer' : 'default',
       userSelect: 'none',
@@ -278,25 +339,26 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
       `}</style>
       <div style={{ 
         display: 'inline-block', 
-        border: '3px solid #8b4513',
         borderRadius: '8px',
+        padding: `${sizes.padding}px`,
+        backgroundColor: '#1f2937', // Overall background color
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-        padding: '8px',
-        backgroundColor: '#8b4513'
+        maxWidth: '100vw',
+        overflow: 'hidden'
       }}>
       {/* Coordinate labels - letters */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: '20px repeat(8, 50px) 20px',
+        gridTemplateColumns: `${sizes.coordinateWidth}px repeat(8, ${sizes.squareSize}px) ${sizes.coordinateWidth}px`,
         marginBottom: '4px'
       }}>
         <div></div>
         {files.map(letter => (
           <div key={letter} style={{
             textAlign: 'center',
-            fontSize: '12px',
+            fontSize: `${sizes.coordinateFontSize}px`,
             fontWeight: 'bold',
-            color: '#f5f5dc'
+            color: '#e1eaf0' // Light coordinate text
           }}>
             {letter}
           </div>
@@ -309,18 +371,18 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
-          width: '20px',
+          width: `${sizes.coordinateWidth}px`,
           marginRight: '4px'
         }}>
           {ranks.map(num => (
             <div key={num} style={{
-              height: '50px',
+              height: `${sizes.squareSize}px`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '12px',
+              fontSize: `${sizes.coordinateFontSize}px`,
               fontWeight: 'bold',
-              color: '#f5f5dc'
+              color: '#e1eaf0' // Light coordinate text
             }}>
               {num}
             </div>
@@ -330,10 +392,10 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
         {/* Chess board */}
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(8, 50px)',
-          gridTemplateRows: 'repeat(8, 50px)',
+          gridTemplateColumns: `repeat(8, ${sizes.squareSize}px)`,
+          gridTemplateRows: `repeat(8, ${sizes.squareSize}px)`,
           gap: '0',
-          border: '2px solid #654321'
+          border: '2px solid #4b5563' // Button color for board border
         }}>
           {displayBoard.map((row, rowIndex) =>
             row.map((piece, colIndex) => {
@@ -367,8 +429,8 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
                   {!piece && validMoves.includes(actualSquare) && (
                     <div style={{
                       position: 'absolute',
-                      width: '12px',
-                      height: '12px',
+                      width: `${Math.max(8, sizes.squareSize * 0.2)}px`,
+                      height: `${Math.max(8, sizes.squareSize * 0.2)}px`,
                       borderRadius: '50%',
                       backgroundColor: '#22c55e',
                       opacity: 0.8
@@ -378,8 +440,8 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
                   {!piece && isHintTo && (
                     <div style={{
                       position: 'absolute',
-                      width: '12px',
-                      height: '12px',
+                      width: `${Math.max(8, sizes.squareSize * 0.2)}px`,
+                      height: `${Math.max(8, sizes.squareSize * 0.2)}px`,
                       borderRadius: '50%',
                       backgroundColor: '#22c55e',
                       opacity: 0.8
@@ -395,18 +457,18 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
-          width: '20px',
+          width: `${sizes.coordinateWidth}px`,
           marginLeft: '4px'
         }}>
           {ranks.map(num => (
             <div key={num} style={{
-              height: '50px',
+              height: `${sizes.squareSize}px`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '12px',
+              fontSize: `${sizes.coordinateFontSize}px`,
               fontWeight: 'bold',
-              color: '#f5f5dc'
+              color: '#e1eaf0' // Light coordinate text
             }}>
               {num}
             </div>
@@ -417,16 +479,16 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
       {/* Bottom coordinate labels - letters */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: '20px repeat(8, 50px) 20px',
+        gridTemplateColumns: `${sizes.coordinateWidth}px repeat(8, ${sizes.squareSize}px) ${sizes.coordinateWidth}px`,
         marginTop: '4px'
       }}>
         <div></div>
         {files.map(letter => (
           <div key={letter} style={{
             textAlign: 'center',
-            fontSize: '12px',
+            fontSize: `${sizes.coordinateFontSize}px`,
             fontWeight: 'bold',
-            color: '#f5f5dc'
+            color: '#e1eaf0' // Light coordinate text
           }}>
             {letter}
           </div>
@@ -436,12 +498,14 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
 
       <div style={{ 
         textAlign: 'center', 
-        fontSize: '10px', 
-        color: '#f5f5dc', 
+        fontSize: `${Math.max(8, sizes.coordinateFontSize - 1)}px`, 
+        color: '#e1eaf0', // Light text color
         marginTop: '8px',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: '#374151', // UI panel color
         padding: '4px',
-        borderRadius: '4px'
+        borderRadius: '4px',
+        wordBreak: 'break-word',
+        lineHeight: '1.2'
       }}>
         Position: {position} {currentPlayer === 'b' ? '(Black\'s perspective)' : '(White\'s perspective)'}
       </div>
@@ -449,3 +513,5 @@ export default function CustomChessboard({ position, onMove, boardKey, currentPl
     </>
   );
 }
+
+
