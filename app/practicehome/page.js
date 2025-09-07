@@ -114,10 +114,11 @@ const lessons = [
 const PracticeHome = () => {
   const router = useRouter();
 
-  const handleStartLesson = (fens) => {
+  const handleStartLesson = (fens, lessonTitle, level) => {
     if (!fens || fens.length === 0) return;
-    const encoded = encodeURIComponent(fens.join(","));
-    router.push(`/practice?fens=${encoded}`);
+    const encodedFens = encodeURIComponent(fens.join(","));
+    const encodedTitle = encodeURIComponent(`${lessonTitle} | ${level}`);
+    router.push(`/practice?fens=${encodedFens}&title=${encodedTitle}`);
   };
 
   return (
@@ -145,19 +146,25 @@ const PracticeHome = () => {
                   <td colSpan={3} className={styles.buttonGroup}>
                     <button
                       className={styles.btn}
-                      onClick={() => handleStartLesson(lesson.fens.beginner)}
+                      onClick={() =>
+                        handleStartLesson(lesson.fens.beginner, lesson.title, "beginner")
+                      }
                     >
                       Beginner
                     </button>
                     <button
                       className={styles.btn}
-                      onClick={() => handleStartLesson(lesson.fens.intermediate)}
+                      onClick={() =>
+                        handleStartLesson(lesson.fens.intermediate, lesson.title, "intermediate")
+                      }
                     >
                       Intermediate
                     </button>
                     <button
                       className={styles.btn}
-                      onClick={() => handleStartLesson(lesson.fens.advanced)}
+                      onClick={() =>
+                        handleStartLesson(lesson.fens.advanced, lesson.title, "advanced")
+                      }
                     >
                       Advanced
                     </button>
