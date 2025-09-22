@@ -617,17 +617,8 @@ export default function ChessApp() {
   };
 
   const setupGame = async () => {
-    console.log("Setup game called");
-    console.log("inputFen state:", JSON.stringify(inputFen));
-    console.log("inputFen length:", inputFen.length);
-    console.log("inputFen type:", typeof inputFen);
     
-    if (!inputFen || inputFen.trim() === '') {
-      setMessage("Please enter FEN notation(s)!");
-      console.log("Setup aborted: no input");
-      return;
-    }
-    
+  
     // Parse FEN input - could be single FEN or multiple FENs
     const fenList = parseFenSet(inputFen);
     
@@ -1010,82 +1001,6 @@ export default function ChessApp() {
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-900">
           Chess Champs 2.0
         </h1>
-        
-        {!isGameSetup ? (
-          <div className="bg-white rounded-lg shadow-xl p-8 mb-8 border border-gray-200">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-900">
-              Set up your chess position
-            </h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-3">
-                  FEN Notation(s):
-                </label>
-                <textarea
-                  value={inputFen}
-                  onChange={(e) => {
-                    console.log("Textarea value changed:", e.target.value);
-                    setInputFen(e.target.value);
-                  }}
-                  placeholder="Enter one or more FEN positions (one per line):
-rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
-                  rows={6}
-                  className="w-full p-4 text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 font-mono text-sm"
-                />
-                <p className="text-xs text-gray-600 mt-2">
-                  💡 You can paste multiple FEN positions (one per line) to create a puzzle set
-                </p>
-              </div>
-              
-              <button
-                onClick={() => {
-                  console.log("=== BUTTON CLICK DEBUG ===");
-                  console.log("Current inputFen state:", JSON.stringify(inputFen));
-                  
-                  // Get the actual textarea value directly
-                  const textareaElement = document.querySelector('textarea');
-                  const textareaValue = textareaElement ? textareaElement.value : '';
-                  console.log("Direct textarea value:", JSON.stringify(textareaValue));
-                  
-                  if (textareaValue && textareaValue.trim()) {
-                    console.log("Using textarea value directly");
-                    setMessage("Setting up puzzle set...");
-                    // Update state first
-                    setInputFen(textareaValue);
-                    // Use the direct textarea value
-                    setupGameWithFen(textareaValue);
-                  } else if (inputFen && inputFen.trim()) {
-                    console.log("Using inputFen state");
-                    setMessage("Setting up puzzle set...");
-                    setupGame();
-                  } else {
-                    console.log("No valid input found");
-                    setMessage("Please enter FEN notation(s)!");
-                  }
-                }}
-                disabled={isAnalyzing}
-                className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold text-lg shadow-md"
-              >
-                {isAnalyzing ? "Analyzing..." : "🚀 Start Puzzle Set"}
-              </button>
-              
-              {/* Message display in setup phase */}
-              {message && (
-                <div className={`mt-6 p-4 rounded-lg border-2 font-medium ${
-                  message.includes('successful') || message.includes('set up') 
-                    ? 'bg-green-50 text-green-800 border-green-200' 
-                    : message.includes('Invalid') || message.includes('Error')
-                    ? 'bg-red-50 text-red-800 border-red-200'
-                    : 'bg-blue-50 text-blue-800 border-blue-200'
-                }`}>
-                  <p>{message}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
           <div className="bg-white rounded-lg shadow-xl p-8 mb-8 border border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-2xl font-semibold text-gray-900">
@@ -1219,7 +1134,6 @@ rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 4 3"
               </div>
             </div>
           </div>
-        )}
       </div>
     </div>
   );

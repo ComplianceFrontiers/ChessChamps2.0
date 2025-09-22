@@ -22,8 +22,8 @@ const lessons = [
         title: "The Opening Principles",
         fens: {
           beginner: [
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-            "r1bqkbnr/pppppppp/2n5/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 2 2"
+            "6k1/6pp/8/8/8/8/6PP/6KQ w - - 0 1",
+            "6k1/6pp/6Q1/8/8/8/6PP/6K1 w - - 0 1"
           ],
           intermediate: ["rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"],
           advanced: ["r1bqkbnr/pppppppp/2n5/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 2"],
