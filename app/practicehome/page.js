@@ -22,29 +22,38 @@ const lessons = [
         title: "The Opening Principles",
         fens: {
           beginner: [
-            "6k1/6pp/8/8/8/8/6PP/6KQ w - - 0 1",
-            "6k1/6pp/6Q1/8/8/8/6PP/6K1 w - - 0 1"
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
           ],
-          intermediate: ["rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"],
-          advanced: ["r1bqkbnr/pppppppp/2n5/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 2"],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
       {
         number: 2,
         title: "Development of Pieces",
         fens: {
-          beginner: ["rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1"],
-          intermediate: ["rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2"],
-          advanced: ["r1bqkb1r/pppppppp/2n2n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 2 3"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
       {
         number: 3,
         title: "Route Planner",
         fens: {
-          beginner: ["8/8/8/8/8/8/8/8 w - - 0 1"], // placeholder
-          intermediate: ["8/8/8/8/8/8/8/8 w - - 0 1"], // placeholder
-          advanced: ["8/8/8/8/8/8/8/8 w - - 0 1"], // placeholder
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
     ],
@@ -56,18 +65,26 @@ const lessons = [
         number: 4,
         title: "The Pin",
         fens: {
-          beginner: ["rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq - 0 1"],
-          intermediate: ["r1bqkbnr/pppppppp/2n5/8/8/2N5/PPPPPPPP/R1BQKBNR w KQkq - 2 2"],
-          advanced: ["r1bqkbnr/pppppppp/2n5/8/8/2N2N2/PPPPPPPP/R1BQKB1R b KQkq - 3 2"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
       {
         number: 5,
         title: "Skewer",
         fens: {
-          beginner: ["8/8/8/8/8/8/8/8 w - - 0 1"],
-          intermediate: ["8/8/8/8/8/8/8/8 w - - 0 1"],
-          advanced: ["8/8/8/8/8/8/8/8 w - - 0 1"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
     ],
@@ -79,9 +96,13 @@ const lessons = [
         number: 8,
         title: "Defensive Move",
         fens: {
-          beginner: ["8/8/8/8/8/8/8/8 w - - 0 1"],
-          intermediate: ["8/8/8/8/8/8/8/8 w - - 0 1"],
-          advanced: ["8/8/8/8/8/8/8/8 w - - 0 1"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
     ],
@@ -93,18 +114,26 @@ const lessons = [
         number: 14,
         title: "Mate in One",
         fens: {
-          beginner: ["6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1"],
-          intermediate: ["6k1/6pp/8/8/8/8/5PPP/6K1 w - - 0 1"],
-          advanced: ["6k1/8/8/8/8/8/5PPP/6K1 w - - 0 1"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
       {
         number: 15,
         title: "Mate in Two",
         fens: {
-          beginner: ["6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1"],
-          intermediate: ["6k1/6pp/8/8/8/8/5PPP/6K1 w - - 0 1"],
-          advanced: ["6k1/8/8/8/8/8/5PPP/6K1 w - - 0 1"],
+          beginner: [
+            "7k/3Q3p/8/5K2/6p1/6P1/7P/8 w - - 0 1",
+            "1rb5/4r3/3p1npb/3kp1P1/1P3P1P/5nR1/2Q1BK2/bN4NR w - - 3 61"
+            
+          ],
+          intermediate: ["8/3r3k/NP1p4/p2QP1P1/1BB3Pp/1R4n1/6K1/5R2 w - - 5 82"],
+          advanced: ["1nr1r3/n4Q2/P1kp2N1/2p3B1/1pp3P1/6P1/1R2P2R/K5N1 w - - 3 43"],
         },
       },
     ],
