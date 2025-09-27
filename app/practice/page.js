@@ -26,7 +26,9 @@ export default function ChessApp() {
   const [showVisualHint, setShowVisualHint] = useState(false); // Visual hint on board
   const [pendingMove, setPendingMove] = useState(null); // Store pending non-best move
   const [showMoveConfirmation, setShowMoveConfirmation] = useState(false); // Show confirmation dialog
-  const [puzzleTitle,setPuzzleTitle] = useState(""); // Store pending non-best move
+  const [puzzleTitle, setPuzzleTitle] = useState(""); // Store puzzle title
+  const [puzzleLevel, setPuzzleLevel] = useState(""); // Store puzzle level
+  const [originalFenSet, setOriginalFenSet] = useState([]); // Store original FEN set for reset
 
   // Force re-render when gamePosition changes
   useEffect(() => {
@@ -59,10 +61,16 @@ export default function ChessApp() {
           }
         }
 
-        const urlTitle=urlParams.get('title');
-        if(urlTitle){
-          const decodedTitle=decodeURIComponent(urlTitle);
+        const urlTitle = urlParams.get('title');
+        if (urlTitle) {
+          const decodedTitle = decodeURIComponent(urlTitle);
           setPuzzleTitle(decodedTitle);
+        }
+
+        const urlLevel = urlParams.get('level');
+        if (urlLevel) {
+          const decodedLevel = decodeURIComponent(urlLevel);
+          setPuzzleLevel(decodedLevel);
         }
         
         if (urlFens && !isGameSetup) {
@@ -418,11 +426,15 @@ export default function ChessApp() {
           // Check if it's user's turn again
           if (gameCopy.turn() === userSide) {
             setIsComputerTurn(false);
-            // Get next best move for user
-            const nextBestMove = await analyzeFenPosition(gameCopy.fen());
-            setAutoCorrectMove(nextBestMove);
+            // Get next best move for user but don't auto-analyze
+            try {
+              const nextBestMove = await analyzeFenPosition(gameCopy.fen());
+              setAutoCorrectMove(nextBestMove);
+            } catch (error) {
+              console.error('Error analyzing next position:', error);
+            }
             setMessage(`Your turn! Make your move.`);
-            setHintUsed(false); // Reset hint for new position
+            // Don't reset hint used here - let user decide when to see hint
           } else {
             // Computer continues playing
             setTimeout(() => {
@@ -571,6 +583,7 @@ export default function ChessApp() {
     
     // Set up for multiple FENs
     setFenSet(fenList);
+    setOriginalFenSet(fenList); // Store original for reset functionality
     setCurrentFenIndex(0);
     setCompletedPuzzles(0);
     
@@ -690,24 +703,43 @@ export default function ChessApp() {
   };
 
   const resetGame = () => {
-    setGame(new Chess());
-    setGamePosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    setBoardPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-    setInputFen("");
-    setFenSet([]);
-    setCurrentFenIndex(0);
-    setAutoCorrectMove("");
-    setCompletedPuzzles(0);
-    setMessage("");
-    setIsGameSetup(false);
-    setTargetGame(null);
-    setIsComputerTurn(false);
-    setUserSide('w');
-    setHintUsed(false);
-    setUserMoveCount(0); // Reset user move count
-    setPendingMove(null);
-    setShowMoveConfirmation(false);
-    setPuzzleTitle("");
+    // Reset to current puzzle position instead of default starting position
+    if (originalFenSet.length > 0 && currentFenIndex < originalFenSet.length) {
+      const currentFen = originalFenSet[currentFenIndex];
+      const newGame = new Chess();
+      newGame.load(currentFen);
+      setGame(newGame);
+      setGamePosition(newGame.fen());
+      setBoardKey(prev => prev + 1);
+      setUserMoveCount(0);
+      setHintUsed(false);
+      setShowVisualHint(false);
+      setPendingMove(null);
+      setShowMoveConfirmation(false);
+      setMessage("Position reset to starting state of current puzzle.");
+    } else {
+      // Fallback to default reset
+      setGame(new Chess());
+      setGamePosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      setBoardPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+      setInputFen("");
+      setFenSet([]);
+      setOriginalFenSet([]);
+      setCurrentFenIndex(0);
+      setAutoCorrectMove("");
+      setCompletedPuzzles(0);
+      setMessage("");
+      setIsGameSetup(false);
+      setTargetGame(null);
+      setIsComputerTurn(false);
+      setUserSide('w');
+      setHintUsed(false);
+      setUserMoveCount(0);
+      setPendingMove(null);
+      setShowMoveConfirmation(false);
+      setPuzzleTitle("");
+      setPuzzleLevel("");
+    }
   };
 
   // Function to proceed with pending move
@@ -745,15 +777,15 @@ export default function ChessApp() {
       
       // Check if it's computer's turn
       if (gameCopy.turn() !== userSide) {
-        setMessage(`✅ Move played: ${move.san}! Computer's turn...`);
+        setMessage(getSuccessMessage(move.san));
         setIsComputerTurn(true);
       } else {
-        setMessage(`✅ Move played: ${move.san}! Your turn continues.`);
+        setMessage(getSuccessMessage(move.san));
+        // Get next best move but don't reset hint automatically
         setTimeout(async () => {
           try {
             const nextBestMove = await analyzeFenPosition(gameCopy.fen());
             setAutoCorrectMove(nextBestMove);
-            setHintUsed(false);
           } catch (error) {
             console.error('Error analyzing next position:', error);
           }
@@ -905,7 +937,7 @@ export default function ChessApp() {
         
         if (!movesMatch) {
           console.log('❌ MOVE REJECTED - Does not match best move');
-          setMessage(`❌ WRONG MOVE! You must play the BEST move found by the engine: "${expectedMove}" (${userFromTo} ≠ ${expectedFromTo}). You tried: "${move.san}". This is the only valid first move!`);
+          setMessage(getErrorMessage());
           return false;
         }
         console.log('✅ MOVE ACCEPTED - Matches best move');
@@ -971,15 +1003,14 @@ export default function ChessApp() {
       
       // Check if it's computer's turn
       if (gameCopy.turn() !== userSide) {
-        setMessage(`✅ Good move: ${move.san}! Computer's turn...`);
+        setMessage(getSuccessMessage(move.san));
         setIsComputerTurn(true);
       } else {
-        setMessage(`✅ Move played: ${move.san}! Your turn continues.`);
+        setMessage(getSuccessMessage(move.san));
         setTimeout(async () => {
           try {
             const nextBestMove = await analyzeFenPosition(gameCopy.fen());
             setAutoCorrectMove(nextBestMove);
-            setHintUsed(false);
           } catch (error) {
             console.error('Error analyzing next position:', error);
           }
@@ -995,148 +1026,194 @@ export default function ChessApp() {
     }
   }, [game, userSide, isComputerTurn, autoCorrectMove]);
 
+  // Navigation functions
+  const goToPreviousPuzzle = () => {
+    if (currentFenIndex > 0) {
+      const prevIndex = currentFenIndex - 1;
+      setCurrentFenIndex(prevIndex);
+      const prevFen = originalFenSet[prevIndex];
+      
+      const newGame = new Chess();
+      newGame.load(prevFen);
+      setGame(newGame);
+      setGamePosition(newGame.fen());
+      setUserSide(newGame.turn());
+      setBoardKey(prev => prev + 1);
+      setUserMoveCount(0);
+      setHintUsed(false);
+      setShowVisualHint(false);
+      setMessage(`Moved to puzzle ${prevIndex + 1}/${originalFenSet.length}`);
+      
+      // Analyze the position
+      analyzeFenPosition(prevFen).then(bestMove => {
+        setAutoCorrectMove(bestMove);
+      }).catch(error => {
+        console.error('Error analyzing previous puzzle:', error);
+      });
+    }
+  };
+
+  const goToNextPuzzle = () => {
+    if (currentFenIndex < originalFenSet.length - 1) {
+      loadNextPuzzle();
+    } else {
+      // All puzzles completed - redirect to home
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  // Get professional feedback messages
+  const getSuccessMessage = (move) => {
+    const messages = [
+      `Woohoo! Nice move - you're awesome! That's the kind of move real champions make! 🏆`,
+      `Excellent! That was brilliant! You're playing like a true chess master! ⭐`,
+      `Perfect move! You've got the champion's instinct! 🎯`,
+      `Outstanding! That's exactly what a chess champion would play! 👑`
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  const getErrorMessage = () => {
+    return "Uh oh! The move wasn't the best move - Let's try again! 🤔";
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-900">
-          Chess Champs 2.0
+    <div className="min-h-screen bg-gray-100">
+      {/* Header Section */}
+      <div className="text-center py-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          {puzzleTitle || "Chess Training"}
         </h1>
-          <div className="bg-white rounded-lg shadow-xl p-8 mb-8 border border-gray-200">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <h2 className="text-2xl font-semibold text-gray-900">
-                {puzzleTitle || (isComputerTurn ? "🤖 Computer's Turn" : "🎯 Your Turn")}
-              </h2>
-              <div className="flex gap-3">
-                <button
-                  onClick={showHint}
-                  disabled={isComputerTurn || !autoCorrectMove}
-                  className="bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium shadow-md"
-                >
-                  💡 Show Hint
-                </button>
-                <button
-                  onClick={resetGame}
-                  className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium shadow-md"
-                >
-                  Reset Game
-                </button>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              <div className="flex flex-col">
-                <div className="mb-6">
-                  <div className="flex justify-center">
-                    <div style={{ width: '400px', height: '400px' }}>
-                      <CustomChessboard
-                        position={game.fen().split(' ')[0]}
-                        currentPlayer="w"
-                        onMove={(sourceSquare, targetSquare) => {
-                          console.log('Custom board move:', sourceSquare, 'to', targetSquare);
-                          return onDrop(sourceSquare, targetSquare);
-                        }}
-                        boardKey={boardKey}
-                        disabled={isComputerTurn}
-                        showVisualHint={showVisualHint}
-                        hintMove={autoCorrectMove}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col space-y-6">
-                <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Game Info:</h3>
-                  {fenSet.length > 1 && (
-                    <p className="text-sm text-gray-700 mb-2">
-                      <span className="font-semibold">Progress:</span> 
-                      <span className="font-medium text-blue-900">
-                        Puzzle {currentFenIndex + 1}/{fenSet.length} 
-                        ({completedPuzzles} moves played)
-                      </span>
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-700 mb-2">
-                    <span className="font-semibold">Turn:</span> 
-                    <span className="font-medium text-gray-900">{game.turn() === 'w' ? 'White' : 'Black'}</span>
-                  </p>
-                  <p className="text-sm text-gray-700 mb-2">
-                    <span className="font-semibold">You are:</span> 
-                    <span className="font-medium text-blue-900">{userSide === 'w' ? 'White' : 'Black'}</span>
-                  </p>
-                  <p className="text-sm text-gray-700 mb-3">
-                    <span className="font-semibold">Game Status:</span> 
-                    <span className="font-medium text-gray-900">
-                      {game.isCheck() ? 'In Check!' : 
-                       game.isCheckmate() ? 'Checkmate!' : 
-                       game.isDraw() ? 'Draw!' : 
-                       game.isStalemate() ? 'Stalemate!' : 'In Progress'}
-                    </span>
-                  </p>
-                  <div className="text-sm text-gray-700">
-                    <span className="font-semibold">Current FEN:</span><br />
-                    <span className="font-mono text-xs bg-white p-2 rounded border break-all block mt-1">{gamePosition}</span>
-                  </div>
-                </div>
-                
-                {message && (
-                  <div className={`p-4 md:p-6 rounded-lg border-2 font-medium ${
-                    message.includes('Good move') || message.includes('won') || message.includes('Correct')
-                      ? 'bg-green-50 text-green-800 border-green-200' 
-                      : message.includes('Invalid') || message.includes('lost') || message.includes('❌')
-                      ? 'bg-red-50 text-red-800 border-red-200'
-                      : message.includes('Computer') || message.includes('🤖')
-                      ? 'bg-orange-50 text-orange-800 border-orange-200'
-                      : message.includes('Hint') || message.includes('💡')
-                      ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
-                      : message.includes('⚠️')
-                      ? 'bg-amber-50 text-amber-800 border-amber-200'
-                      : 'bg-blue-50 text-blue-800 border-blue-200'
-                  }`}>
-                    <p>{message}</p>
-                    {showMoveConfirmation && (
-                      <div className="mt-4 flex gap-3">
-                        <button
-                          onClick={proceedWithMove}
-                          className="bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-md"
-                        >
-                          ✅ Yes, Proceed
-                        </button>
-                        <button
-                          onClick={cancelMove}
-                          className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-md"
-                        >
-                          ❌ Cancel
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <div className="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Move History:</h3>
-                  <div className="text-sm text-gray-700 max-h-32 overflow-y-auto">
-                    {game.history().length > 0 ? (
-                      <div className="space-y-1 font-mono text-xs bg-white p-3 rounded border">
-                        {game.history().map((move, index) => (
-                          <div key={index} className="flex">
-                            <span className="w-8 text-gray-500">{Math.ceil((index + 1) / 2)}.</span>
-                            <span className="text-gray-900 font-medium">{move}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-500 italic">No moves yet</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+        {puzzleLevel && (
+          <p className="text-lg text-gray-600 capitalize">
+            Level: {puzzleLevel}
+          </p>
+        )}
+      </div>
+
+      {/* Player Turn Bar */}
+      <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="mx-4 mb-4 rounded-lg">
+        <div className="py-3 px-6 text-center">
+          <p className="text-white font-semibold text-lg">
+            {isComputerTurn ? "🤖 Computer's Turn" : `${userSide === 'w' ? 'White' : 'Black'} to Move`}
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      {fenSet.length > 1 && (
+        <div className="mx-4 mb-6">
+          <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="rounded-lg py-2 px-4">
+            <p className="text-white text-center font-medium">
+              Puzzle {currentFenIndex + 1}/{fenSet.length}
+            </p>
           </div>
+        </div>
+      )}
+
+      {/* Chess Board Container */}
+      <div className="flex justify-center mb-6">
+        <div className="w-full max-w-md mx-4">
+          <CustomChessboard
+            position={game.fen().split(' ')[0]}
+            currentPlayer="w"
+            onMove={(sourceSquare, targetSquare) => {
+              console.log('Custom board move:', sourceSquare, 'to', targetSquare);
+              return onDrop(sourceSquare, targetSquare);
+            }}
+            boardKey={boardKey}
+            disabled={isComputerTurn}
+            showVisualHint={showVisualHint}
+            hintMove={autoCorrectMove}
+          />
+        </div>
+      </div>
+
+      {/* Feedback Message Bar */}
+      <div className="mx-4 mb-6">
+        <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="rounded-lg py-4 px-6">
+          <p className="text-white text-center font-medium">
+            {message || "Make your move!"}
+          </p>
+          {showMoveConfirmation && (
+            <div className="mt-4 flex justify-center gap-4">
+              <button
+                onClick={proceedWithMove}
+                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              >
+                ✅ Yes, Proceed
+              </button>
+              <button
+                onClick={cancelMove}
+                className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                ❌ Cancel
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mx-4 mb-6 grid grid-cols-3 gap-2">
+        {/* Try Again Button */}
+        <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="rounded-lg">
+          <button
+            onClick={resetGame}
+            className="w-full py-4 px-2 text-white font-semibold hover:bg-gray-600 transition-colors rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+
+        {/* Show Hint Button */}
+        <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="rounded-lg">
+          <button
+            onClick={showHint}
+            disabled={isComputerTurn || !autoCorrectMove}
+            className="w-full py-4 px-2 text-white font-semibold hover:bg-gray-600 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors rounded-lg"
+          >
+            💡 Show Hint
+          </button>
+        </div>
+
+        {/* Explanation Button */}
+        <div style={{ backgroundColor: 'rgb(31, 41, 55)' }} className="rounded-lg">
+          <button
+            onClick={() => window.open('https://youtube.com', '_blank')}
+            className="w-full py-4 px-2 text-white font-semibold hover:bg-gray-600 transition-colors rounded-lg"
+          >
+            📺 Explanation
+          </button>
+        </div>
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="mx-4 mb-8 flex justify-between items-center">
+        <button
+          onClick={goToPreviousPuzzle}
+          disabled={currentFenIndex === 0}
+          className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold flex items-center gap-2"
+        >
+          ← Previous
+        </button>
+
+        <div className="flex-1 text-center">
+          <p className="text-gray-600 font-medium">
+            {currentFenIndex + 1} of {fenSet.length}
+          </p>
+        </div>
+
+        <button
+          onClick={goToNextPuzzle}
+          className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2"
+        >
+          {currentFenIndex < originalFenSet.length - 1 ? 'Next →' : 'Home 🏠'}
+        </button>
       </div>
     </div>
   );
 }
-
 
